@@ -4,18 +4,31 @@ import Html as H
 import Svg exposing (rect, svg, g)
 import Svg.Attributes exposing (transform, version, x, y, width, height)
 
+type alias Cell = 
+    { mined : Bool 
+    , exposed : Bool
+    , flagged : Bool
+    } 
+
 type alias Pos = (Int, Int)
 
-w = 40
-h = 80
-cellSize = 20
+type alias Model = 
+    { 
+    board : Dict Pos Cell
+    }
 
-init : (Dict Pos (), Cmd ())
+type Msg = LeftPick Pos | RightPick Pos
+
+w = 15
+h = 10
+cellSize = 25
+
+init : (Model, Cmd Msg)
 init = 
     let boardAsList 
-          = andThen (\r -> andThen (\c -> [((r, c), ())]) 
+          = andThen (\r -> andThen (\c -> [((r, c), Cell False False False)]) 
             (List.range 0 (w-1)) ) (List.range 0 (h-1)) 
-    in (fromList boardAsList, Cmd.none)
+    in (Model (fromList boardAsList), Cmd.none)
 
 showChecker row col = 
     g [ transform ("scale (" ++ toString cellSize ++ ", " ++ toString cellSize ++ ") " ++ "translate (" ++ toString col ++ ", " ++ toString row ++ ") " )
@@ -28,16 +41,16 @@ showChecker row col =
              []
       ]
 
-view : (Dict Pos (), Cmd ()) -> H.Html ()
+view : (Model, Cmd Msg) -> H.Html Msg
 view (model,_) = 
               svg 
                   [ version "1.1"
                   , width (toString (w * cellSize))
                   , height (toString (h * cellSize))
                   ] 
-                  (values (Dict.map (\(r,c) _ -> showChecker r c) model))
+                  (values (Dict.map (\(r,c) _ -> showChecker r c) (model.board)))
 
-update : () -> (Dict Pos (), Cmd ()) -> (Dict Pos (), Cmd ())
+update : Msg -> (Model, Cmd Msg) -> (Model, Cmd Msg)
 update msg (model,_) = (model, Cmd.none)
 
 main =
