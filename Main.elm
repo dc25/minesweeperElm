@@ -2,10 +2,12 @@ import List exposing (map2, length)
 import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get)
 import Maybe exposing (withDefault)
-import Html as H
+import Html exposing (Html, beginnerProgram)
 import Svg exposing (Svg, rect, svg, g)
 import Svg.Attributes exposing (transform, version, x, y, width, height, style)
-import Svg.Events exposing (onClick)
+import Svg.Events exposing (onClick, on)
+import Json.Decode as Json
+import Html.Events exposing (onWithOptions)
 import Random.Pcg exposing (Generator, Seed, step, float, map, list,initialSeed)
 
 type alias Cell = 
@@ -29,6 +31,15 @@ h = 80
 
 cellSize : Int
 cellSize = 25
+
+
+onRightClick message =
+  on
+    "oncontextmenu"
+    -- { stopPropagation = True
+    -- , preventDefault = True
+    -- }
+    (Json.succeed message)
 
 generateCell : Generator Cell
 generateCell = map (\t -> Cell (t < 0.201) False False 0) (float 0.0 1.0)
@@ -56,6 +67,7 @@ showSquare (row,col) cell =
                , height (toString 0.9)
                , style ("fill:" ++ getColor cell)
                , onClick (LeftPick (row, col))
+               , onRightClick (LeftPick (row, col))
                ] 
                []
 
@@ -68,7 +80,7 @@ showCell pos cell =
            showSquare pos cell
          ]
 
-view : (Board, Cmd Msg) -> H.Html Msg
+view : (Board, Cmd Msg) -> Html Msg
 view (model,_) = 
     svg 
         [ version "1.1"
@@ -87,7 +99,7 @@ update msg (model,_) =
             (model, Cmd.none)
 
 main =
-  H.beginnerProgram { 
+  beginnerProgram { 
       model = init, 
       view = view, 
       update = update 
