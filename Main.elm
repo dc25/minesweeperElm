@@ -3,8 +3,8 @@ import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get)
 import Maybe exposing (withDefault)
 import Html exposing (Html, beginnerProgram)
-import Svg exposing (Svg, rect, svg, g, text_, line, polygon)
-import Svg.Attributes exposing (transform, version, x, y, width, height, style, textAnchor, fill, fontSize, stroke, strokeWidth, x1, y1, x2, y2, points)
+import Svg exposing (Svg, rect, svg, g, text_, line, polygon, circle)
+import Svg.Attributes exposing (transform, version, r, cx, cy, x, y, width, height, style, textAnchor, fill, fontSize, stroke, strokeWidth, x1, y1, x2, y2, points)
 import Svg.Events exposing (onClick, on)
 import Json.Decode as Json
 import Html.Events exposing (onWithOptions)
@@ -70,6 +70,26 @@ showSquare (row,col) cell =
                ] 
                []
 
+showMine : Pos -> List (Svg Msg)
+showMine pos = 
+    [ polygon [ points "0.65,0.15 0.85,0.35 0.65,0.55 0.45,0.35 " 
+              , fill   "brown"
+              ]
+              [
+              ]
+
+    , circle [ cx "0.45" 
+             , cy "0.55"
+             , r  "0.3"
+             , fill "brown"
+             , onClick (LeftPick pos)
+             , onRightClick (RightPick pos)
+             ] 
+             [
+             ]
+    ]
+
+
 showFlag : Pos -> List (Svg Msg)
 showFlag pos = 
     [ polygon [ points "0.20,0.40 0.70,0.55 0.70,0.25"
@@ -98,7 +118,6 @@ showText pos count =
     [ text_ [ x "0.5"
             , y "0.87" 
             , fontSize "1.0"
-            -- , dominantBaseline "middle"
             , fill "blue"
             , textAnchor "middle"
             , onClick (LeftPick pos)
@@ -112,9 +131,9 @@ showCellDetail : Pos -> Cell -> List (Svg Msg)
 showCellDetail pos {mined, exposed, flagged, mineCount} = 
     case (  mined, exposed, flagged, 0 == mineCount) of
          (      _,       _,    True,     _) -> showFlag pos 
-         (   True,    True,       _,     _) -> showText pos mineCount
+         (   True,    True,       _,     _) -> showMine pos 
          (      _,    True,       _, False) -> showText pos mineCount
-         (      _,       _,       _,     _) -> showText pos mineCount
+         (      _,       _,       _,     _) -> []
 
 showCell : Pos -> Cell -> Svg Msg
 showCell pos cell = 
