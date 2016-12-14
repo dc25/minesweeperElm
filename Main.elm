@@ -3,8 +3,8 @@ import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get)
 import Maybe exposing (withDefault)
 import Html exposing (Html, beginnerProgram)
-import Svg exposing (Svg, rect, svg, g, text_)
-import Svg.Attributes exposing (transform, version, x, y, width, height, style, textAnchor, fill, fontSize)
+import Svg exposing (Svg, rect, svg, g, text_, line, polygon)
+import Svg.Attributes exposing (transform, version, x, y, width, height, style, textAnchor, fill, fontSize, stroke, strokeWidth, x1, y1, x2, y2, points)
 import Svg.Events exposing (onClick, on)
 import Json.Decode as Json
 import Html.Events exposing (onWithOptions)
@@ -60,34 +60,58 @@ getColor {exposed} = if exposed then "#909090" else "#AAAAAA"
 
 showSquare : Pos -> Cell -> Svg Msg
 showSquare (row,col) cell = 
-          rect [ x (toString 0.05)
-               , y (toString 0.05)
-               , width (toString 0.9)
-               , height (toString 0.9)
+          rect [ x "0.05"
+               , y "0.05"
+               , width "0.9" 
+               , height "0.9" 
                , style ("fill:" ++ getColor cell)
                , onClick (LeftPick (row, col))
                , onRightClick (RightPick (row, col))
                ] 
                []
 
-showText : Pos -> Int -> Svg Msg
-showText pos count = 
-    text_ [ x "0.5"
-          , y "0.87" 
-          , fontSize "1.0"
-          -- , dominantBaseline "middle"
-          , fill "blue"
-          , textAnchor "middle"
-          , onClick (LeftPick pos)
-          , onRightClick (RightPick pos)
-          ] 
-          [ Svg.text (toString count)
-          ]
+showFlag : Pos -> List (Svg Msg)
+showFlag pos = 
+    [ polygon [ points "0.20,0.40 0.70,0.55 0.70,0.25"
+              , fill   "red"
+              , onClick (LeftPick pos)
+              , onRightClick (RightPick pos)
+              ]
+              [
+              ]
 
-showCellDetail : Pos -> Cell -> Svg Msg
+    , line    [ x1 "0.70" 
+              , y1 "0.25" 
+              , x2 "0.70"
+              , y2 "0.85"
+              , strokeWidth ".07"
+              , stroke "black"
+              , onClick (LeftPick pos)
+              , onRightClick (RightPick pos)
+              ] 
+              [
+              ]
+    ]
+
+showText : Pos -> Int -> List (Svg Msg)
+showText pos count = 
+    [ text_ [ x "0.5"
+            , y "0.87" 
+            , fontSize "1.0"
+            -- , dominantBaseline "middle"
+            , fill "blue"
+            , textAnchor "middle"
+            , onClick (LeftPick pos)
+            , onRightClick (RightPick pos)
+            ] 
+            [ Svg.text (toString count)
+            ]
+    ]
+
+showCellDetail : Pos -> Cell -> List (Svg Msg)
 showCellDetail pos {mined, exposed, flagged, mineCount} = 
     case (  mined, exposed, flagged, 0 == mineCount) of
-         (      _,       _,    True,     _) -> showText pos mineCount
+         (      _,       _,    True,     _) -> showFlag pos 
          (   True,    True,       _,     _) -> showText pos mineCount
          (      _,    True,       _, False) -> showText pos mineCount
          (      _,       _,       _,     _) -> showText pos mineCount
@@ -97,9 +121,7 @@ showCell pos cell =
     let (row,col) = pos 
     in g [ transform ("scale (" ++ toString cellSize ++ ", " ++ toString cellSize ++ ") " ++ "translate (" ++ toString col ++ ", " ++ toString row ++ ") " )
          ]
-         [ showSquare pos cell
-         , showCellDetail pos cell
-         ]
+         ([ showSquare pos cell ] ++ showCellDetail pos cell)
 
 view : (Board, Cmd Msg) -> Html Msg
 view (model,_) = 
