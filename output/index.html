@@ -10574,8 +10574,8 @@ var _user$project$Main$onRightClick = function (message) {
 		_elm_lang$core$Json_Decode$succeed(message));
 };
 var _user$project$Main$cellSize = 25;
-var _user$project$Main$h = 80;
-var _user$project$Main$w = 40;
+var _user$project$Main$h = 30;
+var _user$project$Main$w = 20;
 var _user$project$Main$adjacents = function (_p2) {
 	var _p3 = _p2;
 	var _p9 = _p3._1;
@@ -10621,13 +10621,13 @@ var _user$project$Main$generateCell = A2(
 var _user$project$Main$generateBoard = function () {
 	var indices = A2(
 		_elm_community$list_extra$List_Extra$andThen,
-		function (r) {
+		function (y) {
 			return A2(
 				_elm_community$list_extra$List_Extra$andThen,
-				function (c) {
+				function (x) {
 					return {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: r, _1: c},
+						_0: {ctor: '_Tuple2', _0: x, _1: y},
 						_1: {ctor: '[]'}
 					};
 				},
@@ -10662,44 +10662,67 @@ var _user$project$Main$init = function () {
 }();
 var _user$project$Main$exposeCells = F2(
 	function (pos, board) {
-		var c = A2(
-			_elm_lang$core$Maybe$withDefault,
-			A4(_user$project$Main$Cell, false, false, false, 0),
-			A2(_elm_lang$core$Dict$get, pos, board));
-		return A3(
+		var indices = _user$project$Main$adjacents(pos);
+		var getCell = F2(
+			function (board, pos) {
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					A4(_user$project$Main$Cell, false, false, false, 0),
+					A2(_elm_lang$core$Dict$get, pos, board));
+			});
+		var c = A2(getCell, board, pos);
+		var _p11 = c;
+		var mined = _p11.mined;
+		var exposed = _p11.exposed;
+		var flagged = _p11.flagged;
+		var count = _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p12) {
+					var _p13 = _p12;
+					return _p13.mined;
+				},
+				A2(
+					_elm_lang$core$List$map,
+					getCell(board),
+					indices)));
+		var checklist = (mined || (exposed || (flagged || (!_elm_lang$core$Native_Utils.eq(count, 0))))) ? {ctor: '[]'} : indices;
+		var exposedSelection = A3(
 			_elm_lang$core$Dict$insert,
 			pos,
 			_elm_lang$core$Native_Utils.update(
 				c,
-				{exposed: true}),
+				{exposed: true, mineCount: count}),
 			board);
+		var exposedNeighbors = A3(_elm_lang$core$List$foldl, _user$project$Main$exposeCells, exposedSelection, checklist);
+		return exposedNeighbors;
 	});
 var _user$project$Main$update = F2(
-	function (msg, _p11) {
-		var _p12 = _p11;
-		var _p15 = _p12._0;
-		var _p13 = msg;
-		if (_p13.ctor === 'LeftPick') {
+	function (msg, _p14) {
+		var _p15 = _p14;
+		var _p18 = _p15._0;
+		var _p16 = msg;
+		if (_p16.ctor === 'LeftPick') {
 			return {
 				ctor: '_Tuple2',
-				_0: A2(_user$project$Main$exposeCells, _p13._0, _p15),
+				_0: A2(_user$project$Main$exposeCells, _p16._0, _p18),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
-			var _p14 = _p13._0;
+			var _p17 = _p16._0;
 			var c = A2(
 				_elm_lang$core$Maybe$withDefault,
 				A4(_user$project$Main$Cell, false, false, false, 0),
-				A2(_elm_lang$core$Dict$get, _p14, _p15));
-			return c.exposed ? {ctor: '_Tuple2', _0: _p15, _1: _elm_lang$core$Platform_Cmd$none} : {
+				A2(_elm_lang$core$Dict$get, _p17, _p18));
+			return c.exposed ? {ctor: '_Tuple2', _0: _p18, _1: _elm_lang$core$Platform_Cmd$none} : {
 				ctor: '_Tuple2',
 				_0: A3(
 					_elm_lang$core$Dict$insert,
-					_p14,
+					_p17,
 					_elm_lang$core$Native_Utils.update(
 						c,
 						{flagged: !c.flagged}),
-					_p15),
+					_p18),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		}
@@ -10711,10 +10734,10 @@ var _user$project$Main$LeftPick = function (a) {
 	return {ctor: 'LeftPick', _0: a};
 };
 var _user$project$Main$showSquare = F2(
-	function (_p16, cell) {
-		var _p17 = _p16;
-		var _p19 = _p17._0;
-		var _p18 = _p17._1;
+	function (_p19, cell) {
+		var _p20 = _p19;
+		var _p22 = _p20._1;
+		var _p21 = _p20._0;
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			{
@@ -10740,12 +10763,12 @@ var _user$project$Main$showSquare = F2(
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Events$onClick(
 										_user$project$Main$LeftPick(
-											{ctor: '_Tuple2', _0: _p19, _1: _p18})),
+											{ctor: '_Tuple2', _0: _p21, _1: _p22})),
 									_1: {
 										ctor: '::',
 										_0: _user$project$Main$onRightClick(
 											_user$project$Main$RightPick(
-												{ctor: '_Tuple2', _0: _p19, _1: _p18})),
+												{ctor: '_Tuple2', _0: _p21, _1: _p22})),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -10923,39 +10946,39 @@ var _user$project$Main$showText = F2(
 		};
 	});
 var _user$project$Main$showCellDetail = F2(
-	function (pos, _p20) {
-		var _p21 = _p20;
-		var _p23 = _p21.mineCount;
-		var _p22 = {
+	function (pos, _p23) {
+		var _p24 = _p23;
+		var _p26 = _p24.mineCount;
+		var _p25 = {
 			ctor: '_Tuple4',
-			_0: _p21.mined,
-			_1: _p21.exposed,
-			_2: _p21.flagged,
-			_3: _elm_lang$core$Native_Utils.eq(0, _p23)
+			_0: _p24.mined,
+			_1: _p24.exposed,
+			_2: _p24.flagged,
+			_3: _elm_lang$core$Native_Utils.eq(0, _p26)
 		};
-		_v7_3:
+		_v8_3:
 		do {
-			_v7_0:
+			_v8_0:
 			do {
-				if (_p22._1 === true) {
-					if (_p22._2 === true) {
-						break _v7_0;
+				if (_p25._1 === true) {
+					if (_p25._2 === true) {
+						break _v8_0;
 					} else {
-						if (_p22._0 === true) {
+						if (_p25._0 === true) {
 							return _user$project$Main$showMine(pos);
 						} else {
-							if (_p22._3 === false) {
-								return A2(_user$project$Main$showText, pos, _p23);
+							if (_p25._3 === false) {
+								return A2(_user$project$Main$showText, pos, _p26);
 							} else {
-								break _v7_3;
+								break _v8_3;
 							}
 						}
 					}
 				} else {
-					if (_p22._2 === true) {
-						break _v7_0;
+					if (_p25._2 === true) {
+						break _v8_0;
 					} else {
-						break _v7_3;
+						break _v8_3;
 					}
 				}
 			} while(false);
@@ -10965,9 +10988,9 @@ var _user$project$Main$showCellDetail = F2(
 	});
 var _user$project$Main$showCell = F2(
 	function (pos, cell) {
-		var _p24 = pos;
-		var row = _p24._0;
-		var col = _p24._1;
+		var _p27 = pos;
+		var x = _p27._0;
+		var y = _p27._1;
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{
@@ -10993,13 +11016,13 @@ var _user$project$Main$showCell = F2(
 											'translate (',
 											A2(
 												_elm_lang$core$Basics_ops['++'],
-												_elm_lang$core$Basics$toString(col),
+												_elm_lang$core$Basics$toString(x),
 												A2(
 													_elm_lang$core$Basics_ops['++'],
 													', ',
 													A2(
 														_elm_lang$core$Basics_ops['++'],
-														_elm_lang$core$Basics$toString(row),
+														_elm_lang$core$Basics$toString(y),
 														') ')))))))))),
 				_1: {ctor: '[]'}
 			},
@@ -11012,8 +11035,8 @@ var _user$project$Main$showCell = F2(
 				},
 				A2(_user$project$Main$showCellDetail, pos, cell)));
 	});
-var _user$project$Main$view = function (_p25) {
-	var _p26 = _p25;
+var _user$project$Main$view = function (_p28) {
+	var _p29 = _p28;
 	return A2(
 		_elm_lang$svg$Svg$svg,
 		{
@@ -11038,7 +11061,7 @@ var _user$project$Main$view = function (_p25) {
 					function (p, c) {
 						return A2(_user$project$Main$showCell, p, c);
 					}),
-				_p26._0)));
+				_p29._0)));
 };
 var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
 	{model: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update})();

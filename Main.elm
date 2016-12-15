@@ -24,10 +24,10 @@ type alias Board = Dict Pos Cell
 type Msg = LeftPick Pos | RightPick Pos
 
 w : Int
-w = 40
+w = 20
 
 h : Int
-h = 80
+h = 30
 
 cellSize : Int
 cellSize = 25
@@ -45,7 +45,7 @@ generateCell = R.map (\t -> Cell (t < 0.201) False False 0) (float 0.0 1.0)
 
 generateBoard : Generator Board
 generateBoard = 
-    let indices = andThen (\r -> andThen (\c -> [(r, c)]) 
+    let indices = andThen (\y -> andThen (\x -> [(x, y)]) 
                               (range 0 (w-1)) ) (range 0 (h-1)) 
     in  R.map (\cs -> fromList (map2 (,) indices cs))
             (list (length indices) generateCell)
@@ -58,14 +58,14 @@ getColor : Cell -> String
 getColor {exposed} = if exposed then "#909090" else "#AAAAAA"
 
 showSquare : Pos -> Cell -> Svg Msg
-showSquare (row,col) cell = 
+showSquare (xCoord,yCoord) cell = 
           rect [ x "0.05"
                , y "0.05"
                , width "0.9" 
                , height "0.9" 
                , style ("fill:" ++ getColor cell)
-               , onClick (LeftPick (row, col))
-               , onRightClick (RightPick (row, col))
+               , onClick (LeftPick (xCoord, yCoord))
+               , onRightClick (RightPick (xCoord, yCoord))
                ] 
                []
 
@@ -136,8 +136,8 @@ showCellDetail pos {mined, exposed, flagged, mineCount} =
 
 showCell : Pos -> Cell -> Svg Msg
 showCell pos cell = 
-    let (row,col) = pos 
-    in g [ transform ("scale (" ++ toString cellSize ++ ", " ++ toString cellSize ++ ") " ++ "translate (" ++ toString col ++ ", " ++ toString row ++ ") " )
+    let (x,y) = pos 
+    in g [ transform ("scale (" ++ toString cellSize ++ ", " ++ toString cellSize ++ ") " ++ "translate (" ++ toString x ++ ", " ++ toString y ++ ") " )
          ]
          ([ showSquare pos cell ] ++ showCellDetail pos cell)
 
@@ -163,8 +163,15 @@ adjacents (x,y) =
               
 exposeCells : Pos -> Board -> Board
 exposeCells pos board =
-    let c = withDefault (Cell False False False 0) (get pos board)
-    in (insert pos ({c|exposed = True}) board)
+    let getCell board pos = withDefault (Cell False False False 0) (get pos board)
+        c = getCell board pos 
+        indices = adjacents pos
+        count = length (filter (\{mined} -> mined) (List.map (getCell board) indices))
+        {mined,exposed,flagged} = c
+        checklist = if mined || exposed || flagged || count /= 0 then [] else indices
+        exposedSelection = (insert pos ({c|exposed = True, mineCount = count}) board)
+        exposedNeighbors = List.foldl exposeCells exposedSelection checklist
+    in exposedNeighbors
 
 update : Msg -> (Board, Cmd Msg) -> (Board, Cmd Msg)
 update msg (board,_) = 
