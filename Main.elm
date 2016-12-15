@@ -1,6 +1,6 @@
 import List exposing (map2, length, range, filter, map, concatMap)
 import List.Extra exposing (andThen)
-import Dict exposing (Dict, fromList, values, insert, get)
+import Dict exposing (Dict, fromList, values, insert, get, filter, isEmpty)
 import Maybe exposing (withDefault)
 import Html exposing (Html, beginnerProgram)
 import Svg exposing (Svg, rect, svg, g, text_, line, polygon, circle)
@@ -141,6 +141,9 @@ showCell pos cell =
          ]
          ([ showSquare pos cell ] ++ showCellDetail pos cell)
 
+gameOver : Board -> Bool
+gameOver board = not (isEmpty (Dict.filter (\_ {exposed, mined} -> exposed && mined ) board))
+
 view : (Board, Cmd Msg) -> Html Msg
 view (board,_) = 
     svg 
@@ -155,16 +158,16 @@ adjacents (x,y) =
     let patch = range (x-1) (x+1) |> concatMap (\xx -> 
                   range (y-1) (y+1) |> List.map (\yy -> (xx,yy)))
 
-    in filter (\(xx,yy) -> (xx,yy) /= (x,y) 
-                           && xx >= 0 && yy >= 0 
-                           && xx < w && yy < h ) patch
+    in List.filter (\(xx,yy) ->    (xx,yy) /= (x,y) 
+                                && xx >= 0 && yy >= 0 
+                                && xx < w && yy < h ) patch
               
 exposeCells : Pos -> Board -> Board
 exposeCells pos board =
     let getCell board pos = withDefault (Cell False False False 0) (get pos board)
         c = getCell board pos 
         indices = adjacents pos
-        count = length (filter (\{mined} -> mined) (List.map (getCell board) indices))
+        count = length (List.filter (\{mined} -> mined) (List.map (getCell board) indices))
         {mined,exposed,flagged} = c
         checklist = if mined || exposed || flagged || count /= 0 then [] else indices
         exposedSelection = (insert pos ({c|exposed = True, mineCount = count}) board)
@@ -177,15 +180,17 @@ exposeCells pos board =
 
 update : Msg -> (Board, Cmd Msg) -> (Board, Cmd Msg)
 update msg (board,_) = 
-    case msg of
-        LeftPick pos -> 
-            (exposeCells pos board, Cmd.none)
+    if gameOver board 
+    then (board, Cmd.none)
+    else case msg of
+             LeftPick pos -> 
+                 (exposeCells pos board, Cmd.none)
 
-        RightPick pos ->
-            let c = withDefault (Cell False False False 0) (get pos board)
-            in if (c.exposed)
-               then (board, Cmd.none) -- can't flag an exposed cell.
-               else (insert pos ({c|flagged = not (c.flagged)}) board, Cmd.none)
+             RightPick pos ->
+                 let c = withDefault (Cell False False False 0) (get pos board)
+                 in if (c.exposed)
+                    then (board, Cmd.none) -- can't flag an exposed cell.
+                    else (insert pos ({c|flagged = not (c.flagged)}) board, Cmd.none)
 
 main =
   beginnerProgram { 
