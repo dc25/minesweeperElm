@@ -161,10 +161,6 @@ adjacents (x,y) =
                            && xx < w
                            && yy < h ) patch
               
-exposeMines : Board -> Board
-exposeMines board = 
-    Dict.map (\_ c -> if (c.mined) then {c|exposed=True} else c) board
-
 exposeCells : Pos -> Board -> Board
 exposeCells pos board =
     let getCell board pos = withDefault (Cell False False False 0) (get pos board)
@@ -175,7 +171,9 @@ exposeCells pos board =
         checklist = if mined || exposed || flagged || count /= 0 then [] else indices
         exposedSelection = (insert pos ({c|exposed = True, mineCount = count}) board)
         exposedNeighbors = List.foldl exposeCells exposedSelection checklist
-        exposedMines = if mined then exposeMines exposedNeighbors else exposedNeighbors
+        exposedMines = if mined 
+                       then Dict.map (\_ c -> if (c.mined) then {c|exposed=True} else c) exposedNeighbors
+                       else exposedNeighbors
     in exposedMines
 
 update : Msg -> (Board, Cmd Msg) -> (Board, Cmd Msg)
