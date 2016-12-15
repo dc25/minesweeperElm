@@ -10562,20 +10562,9 @@ var _mgold$elm_random_pcg$Random_Pcg$fromJson = _elm_lang$core$Json_Decode$oneOf
 			_1: {ctor: '[]'}
 		}
 	});
-var _user$project$Main$exposeMines = function (board) {
-	return A2(
-		_elm_lang$core$Dict$map,
-		F2(
-			function (_p0, c) {
-				return c.mined ? _elm_lang$core$Native_Utils.update(
-					c,
-					{exposed: true}) : c;
-			}),
-		board);
-};
-var _user$project$Main$getColor = function (_p1) {
-	var _p2 = _p1;
-	return _p2.exposed ? '#909090' : '#AAAAAA';
+var _user$project$Main$getColor = function (_p0) {
+	var _p1 = _p0;
+	return _p1.exposed ? '#909090' : '#AAAAAA';
 };
 var _user$project$Main$onRightClick = function (message) {
 	return A3(
@@ -10587,10 +10576,10 @@ var _user$project$Main$onRightClick = function (message) {
 var _user$project$Main$cellSize = 25;
 var _user$project$Main$h = 20;
 var _user$project$Main$w = 30;
-var _user$project$Main$adjacents = function (_p3) {
-	var _p4 = _p3;
-	var _p10 = _p4._1;
-	var _p9 = _p4._0;
+var _user$project$Main$adjacents = function (_p2) {
+	var _p3 = _p2;
+	var _p9 = _p3._1;
+	var _p8 = _p3._0;
 	var patch = A2(
 		_elm_lang$core$List$concatMap,
 		function (xx) {
@@ -10599,18 +10588,18 @@ var _user$project$Main$adjacents = function (_p3) {
 				function (yy) {
 					return {ctor: '_Tuple2', _0: xx, _1: yy};
 				},
-				A2(_elm_lang$core$List$range, _p10 - 1, _p10 + 1));
+				A2(_elm_lang$core$List$range, _p9 - 1, _p9 + 1));
 		},
-		A2(_elm_lang$core$List$range, _p9 - 1, _p9 + 1));
+		A2(_elm_lang$core$List$range, _p8 - 1, _p8 + 1));
 	return A2(
 		_elm_lang$core$List$filter,
-		function (_p5) {
-			var _p6 = _p5;
-			var _p8 = _p6._1;
-			var _p7 = _p6._0;
+		function (_p4) {
+			var _p5 = _p4;
+			var _p7 = _p5._1;
+			var _p6 = _p5._0;
 			return (!_elm_lang$core$Native_Utils.eq(
-				{ctor: '_Tuple2', _0: _p7, _1: _p8},
-				{ctor: '_Tuple2', _0: _p9, _1: _p10})) && ((_elm_lang$core$Native_Utils.cmp(_p7, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p8, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p7, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p8, _user$project$Main$h) < 0))));
+				{ctor: '_Tuple2', _0: _p6, _1: _p7},
+				{ctor: '_Tuple2', _0: _p8, _1: _p9})) && ((_elm_lang$core$Native_Utils.cmp(_p6, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p7, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p6, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p7, _user$project$Main$h) < 0))));
 		},
 		patch);
 };
@@ -10664,11 +10653,11 @@ var _user$project$Main$generateBoard = function () {
 			_user$project$Main$generateCell));
 }();
 var _user$project$Main$init = function () {
-	var _p11 = A2(
+	var _p10 = A2(
 		_mgold$elm_random_pcg$Random_Pcg$step,
 		_user$project$Main$generateBoard,
 		_mgold$elm_random_pcg$Random_Pcg$initialSeed(0));
-	var board = _p11._0;
+	var board = _p10._0;
 	return {ctor: '_Tuple2', _0: board, _1: _elm_lang$core$Platform_Cmd$none};
 }();
 var _user$project$Main$exposeCells = F2(
@@ -10682,16 +10671,16 @@ var _user$project$Main$exposeCells = F2(
 					A2(_elm_lang$core$Dict$get, pos, board));
 			});
 		var c = A2(getCell, board, pos);
-		var _p12 = c;
-		var mined = _p12.mined;
-		var exposed = _p12.exposed;
-		var flagged = _p12.flagged;
+		var _p11 = c;
+		var mined = _p11.mined;
+		var exposed = _p11.exposed;
+		var flagged = _p11.flagged;
 		var count = _elm_lang$core$List$length(
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p13) {
-					var _p14 = _p13;
-					return _p14.mined;
+				function (_p12) {
+					var _p13 = _p12;
+					return _p13.mined;
 				},
 				A2(
 					_elm_lang$core$List$map,
@@ -10706,7 +10695,15 @@ var _user$project$Main$exposeCells = F2(
 				{exposed: true, mineCount: count}),
 			board);
 		var exposedNeighbors = A3(_elm_lang$core$List$foldl, _user$project$Main$exposeCells, exposedSelection, checklist);
-		var exposedMines = mined ? _user$project$Main$exposeMines(exposedNeighbors) : exposedNeighbors;
+		var exposedMines = mined ? A2(
+			_elm_lang$core$Dict$map,
+			F2(
+				function (_p14, c) {
+					return c.mined ? _elm_lang$core$Native_Utils.update(
+						c,
+						{exposed: true}) : c;
+				}),
+			exposedNeighbors) : exposedNeighbors;
 		return exposedMines;
 	});
 var _user$project$Main$update = F2(
