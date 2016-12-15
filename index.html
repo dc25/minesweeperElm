@@ -10574,8 +10574,8 @@ var _user$project$Main$onRightClick = function (message) {
 		_elm_lang$core$Json_Decode$succeed(message));
 };
 var _user$project$Main$cellSize = 25;
-var _user$project$Main$h = 20;
-var _user$project$Main$w = 30;
+var _user$project$Main$h = 200;
+var _user$project$Main$w = 40;
 var _user$project$Main$adjacents = function (_p2) {
 	var _p3 = _p2;
 	var _p9 = _p3._1;
@@ -10662,6 +10662,12 @@ var _user$project$Main$init = function () {
 }();
 var _user$project$Main$exposeCells = F2(
 	function (pos, board) {
+		var exposeMinedCell = F2(
+			function (_p11, c) {
+				return c.mined ? _elm_lang$core$Native_Utils.update(
+					c,
+					{exposed: true}) : c;
+			});
 		var indices = _user$project$Main$adjacents(pos);
 		var getCell = F2(
 			function (board, pos) {
@@ -10671,16 +10677,16 @@ var _user$project$Main$exposeCells = F2(
 					A2(_elm_lang$core$Dict$get, pos, board));
 			});
 		var c = A2(getCell, board, pos);
-		var _p11 = c;
-		var mined = _p11.mined;
-		var exposed = _p11.exposed;
-		var flagged = _p11.flagged;
+		var _p12 = c;
+		var mined = _p12.mined;
+		var exposed = _p12.exposed;
+		var flagged = _p12.flagged;
 		var count = _elm_lang$core$List$length(
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p12) {
-					var _p13 = _p12;
-					return _p13.mined;
+				function (_p13) {
+					var _p14 = _p13;
+					return _p14.mined;
 				},
 				A2(
 					_elm_lang$core$List$map,
@@ -10695,15 +10701,7 @@ var _user$project$Main$exposeCells = F2(
 				{exposed: true, mineCount: count}),
 			board);
 		var exposedNeighbors = A3(_elm_lang$core$List$foldl, _user$project$Main$exposeCells, exposedSelection, checklist);
-		var exposedMines = mined ? A2(
-			_elm_lang$core$Dict$map,
-			F2(
-				function (_p14, c) {
-					return c.mined ? _elm_lang$core$Native_Utils.update(
-						c,
-						{exposed: true}) : c;
-				}),
-			exposedNeighbors) : exposedNeighbors;
+		var exposedMines = mined ? A2(_elm_lang$core$Dict$map, exposeMinedCell, exposedNeighbors) : exposedNeighbors;
 		return exposedMines;
 	});
 var _user$project$Main$update = F2(
