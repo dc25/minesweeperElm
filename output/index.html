@@ -10562,9 +10562,20 @@ var _mgold$elm_random_pcg$Random_Pcg$fromJson = _elm_lang$core$Json_Decode$oneOf
 			_1: {ctor: '[]'}
 		}
 	});
-var _user$project$Main$getColor = function (_p0) {
-	var _p1 = _p0;
-	return _p1.exposed ? '#909090' : '#AAAAAA';
+var _user$project$Main$exposeMines = function (board) {
+	return A2(
+		_elm_lang$core$Dict$map,
+		F2(
+			function (_p0, c) {
+				return c.mined ? _elm_lang$core$Native_Utils.update(
+					c,
+					{exposed: true}) : c;
+			}),
+		board);
+};
+var _user$project$Main$getColor = function (_p1) {
+	var _p2 = _p1;
+	return _p2.exposed ? '#909090' : '#AAAAAA';
 };
 var _user$project$Main$onRightClick = function (message) {
 	return A3(
@@ -10574,12 +10585,12 @@ var _user$project$Main$onRightClick = function (message) {
 		_elm_lang$core$Json_Decode$succeed(message));
 };
 var _user$project$Main$cellSize = 25;
-var _user$project$Main$h = 30;
-var _user$project$Main$w = 20;
-var _user$project$Main$adjacents = function (_p2) {
-	var _p3 = _p2;
-	var _p9 = _p3._1;
-	var _p8 = _p3._0;
+var _user$project$Main$h = 20;
+var _user$project$Main$w = 30;
+var _user$project$Main$adjacents = function (_p3) {
+	var _p4 = _p3;
+	var _p10 = _p4._1;
+	var _p9 = _p4._0;
 	var patch = A2(
 		_elm_lang$core$List$concatMap,
 		function (xx) {
@@ -10588,18 +10599,18 @@ var _user$project$Main$adjacents = function (_p2) {
 				function (yy) {
 					return {ctor: '_Tuple2', _0: xx, _1: yy};
 				},
-				A2(_elm_lang$core$List$range, _p9 - 1, _p9 + 1));
+				A2(_elm_lang$core$List$range, _p10 - 1, _p10 + 1));
 		},
-		A2(_elm_lang$core$List$range, _p8 - 1, _p8 + 1));
+		A2(_elm_lang$core$List$range, _p9 - 1, _p9 + 1));
 	return A2(
 		_elm_lang$core$List$filter,
-		function (_p4) {
-			var _p5 = _p4;
-			var _p7 = _p5._1;
-			var _p6 = _p5._0;
+		function (_p5) {
+			var _p6 = _p5;
+			var _p8 = _p6._1;
+			var _p7 = _p6._0;
 			return (!_elm_lang$core$Native_Utils.eq(
-				{ctor: '_Tuple2', _0: _p6, _1: _p7},
-				{ctor: '_Tuple2', _0: _p8, _1: _p9})) && ((_elm_lang$core$Native_Utils.cmp(_p6, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p7, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p6, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p7, _user$project$Main$h) < 0))));
+				{ctor: '_Tuple2', _0: _p7, _1: _p8},
+				{ctor: '_Tuple2', _0: _p9, _1: _p10})) && ((_elm_lang$core$Native_Utils.cmp(_p7, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p8, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p7, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p8, _user$project$Main$h) < 0))));
 		},
 		patch);
 };
@@ -10653,11 +10664,11 @@ var _user$project$Main$generateBoard = function () {
 			_user$project$Main$generateCell));
 }();
 var _user$project$Main$init = function () {
-	var _p10 = A2(
+	var _p11 = A2(
 		_mgold$elm_random_pcg$Random_Pcg$step,
 		_user$project$Main$generateBoard,
 		_mgold$elm_random_pcg$Random_Pcg$initialSeed(0));
-	var board = _p10._0;
+	var board = _p11._0;
 	return {ctor: '_Tuple2', _0: board, _1: _elm_lang$core$Platform_Cmd$none};
 }();
 var _user$project$Main$exposeCells = F2(
@@ -10671,16 +10682,16 @@ var _user$project$Main$exposeCells = F2(
 					A2(_elm_lang$core$Dict$get, pos, board));
 			});
 		var c = A2(getCell, board, pos);
-		var _p11 = c;
-		var mined = _p11.mined;
-		var exposed = _p11.exposed;
-		var flagged = _p11.flagged;
+		var _p12 = c;
+		var mined = _p12.mined;
+		var exposed = _p12.exposed;
+		var flagged = _p12.flagged;
 		var count = _elm_lang$core$List$length(
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p12) {
-					var _p13 = _p12;
-					return _p13.mined;
+				function (_p13) {
+					var _p14 = _p13;
+					return _p14.mined;
 				},
 				A2(
 					_elm_lang$core$List$map,
@@ -10695,34 +10706,35 @@ var _user$project$Main$exposeCells = F2(
 				{exposed: true, mineCount: count}),
 			board);
 		var exposedNeighbors = A3(_elm_lang$core$List$foldl, _user$project$Main$exposeCells, exposedSelection, checklist);
-		return exposedNeighbors;
+		var exposedMines = mined ? _user$project$Main$exposeMines(exposedNeighbors) : exposedNeighbors;
+		return exposedMines;
 	});
 var _user$project$Main$update = F2(
-	function (msg, _p14) {
-		var _p15 = _p14;
-		var _p18 = _p15._0;
-		var _p16 = msg;
-		if (_p16.ctor === 'LeftPick') {
+	function (msg, _p15) {
+		var _p16 = _p15;
+		var _p19 = _p16._0;
+		var _p17 = msg;
+		if (_p17.ctor === 'LeftPick') {
 			return {
 				ctor: '_Tuple2',
-				_0: A2(_user$project$Main$exposeCells, _p16._0, _p18),
+				_0: A2(_user$project$Main$exposeCells, _p17._0, _p19),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
-			var _p17 = _p16._0;
+			var _p18 = _p17._0;
 			var c = A2(
 				_elm_lang$core$Maybe$withDefault,
 				A4(_user$project$Main$Cell, false, false, false, 0),
-				A2(_elm_lang$core$Dict$get, _p17, _p18));
-			return c.exposed ? {ctor: '_Tuple2', _0: _p18, _1: _elm_lang$core$Platform_Cmd$none} : {
+				A2(_elm_lang$core$Dict$get, _p18, _p19));
+			return c.exposed ? {ctor: '_Tuple2', _0: _p19, _1: _elm_lang$core$Platform_Cmd$none} : {
 				ctor: '_Tuple2',
 				_0: A3(
 					_elm_lang$core$Dict$insert,
-					_p17,
+					_p18,
 					_elm_lang$core$Native_Utils.update(
 						c,
 						{flagged: !c.flagged}),
-					_p18),
+					_p19),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		}
@@ -10734,10 +10746,10 @@ var _user$project$Main$LeftPick = function (a) {
 	return {ctor: 'LeftPick', _0: a};
 };
 var _user$project$Main$showSquare = F2(
-	function (_p19, cell) {
-		var _p20 = _p19;
-		var _p22 = _p20._1;
-		var _p21 = _p20._0;
+	function (_p20, cell) {
+		var _p21 = _p20;
+		var _p23 = _p21._1;
+		var _p22 = _p21._0;
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			{
@@ -10763,12 +10775,12 @@ var _user$project$Main$showSquare = F2(
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Events$onClick(
 										_user$project$Main$LeftPick(
-											{ctor: '_Tuple2', _0: _p21, _1: _p22})),
+											{ctor: '_Tuple2', _0: _p22, _1: _p23})),
 									_1: {
 										ctor: '::',
 										_0: _user$project$Main$onRightClick(
 											_user$project$Main$RightPick(
-												{ctor: '_Tuple2', _0: _p21, _1: _p22})),
+												{ctor: '_Tuple2', _0: _p22, _1: _p23})),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -10946,36 +10958,36 @@ var _user$project$Main$showText = F2(
 		};
 	});
 var _user$project$Main$showCellDetail = F2(
-	function (pos, _p23) {
-		var _p24 = _p23;
-		var _p26 = _p24.mineCount;
-		var _p25 = {
+	function (pos, _p24) {
+		var _p25 = _p24;
+		var _p27 = _p25.mineCount;
+		var _p26 = {
 			ctor: '_Tuple4',
-			_0: _p24.mined,
-			_1: _p24.exposed,
-			_2: _p24.flagged,
-			_3: _elm_lang$core$Native_Utils.eq(0, _p26)
+			_0: _p25.mined,
+			_1: _p25.exposed,
+			_2: _p25.flagged,
+			_3: _elm_lang$core$Native_Utils.eq(0, _p27)
 		};
 		_v8_3:
 		do {
 			_v8_0:
 			do {
-				if (_p25._1 === true) {
-					if (_p25._2 === true) {
+				if (_p26._1 === true) {
+					if (_p26._2 === true) {
 						break _v8_0;
 					} else {
-						if (_p25._0 === true) {
+						if (_p26._0 === true) {
 							return _user$project$Main$showMine(pos);
 						} else {
-							if (_p25._3 === false) {
-								return A2(_user$project$Main$showText, pos, _p26);
+							if (_p26._3 === false) {
+								return A2(_user$project$Main$showText, pos, _p27);
 							} else {
 								break _v8_3;
 							}
 						}
 					}
 				} else {
-					if (_p25._2 === true) {
+					if (_p26._2 === true) {
 						break _v8_0;
 					} else {
 						break _v8_3;
@@ -10988,9 +11000,9 @@ var _user$project$Main$showCellDetail = F2(
 	});
 var _user$project$Main$showCell = F2(
 	function (pos, cell) {
-		var _p27 = pos;
-		var x = _p27._0;
-		var y = _p27._1;
+		var _p28 = pos;
+		var x = _p28._0;
+		var y = _p28._1;
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{
@@ -11035,8 +11047,8 @@ var _user$project$Main$showCell = F2(
 				},
 				A2(_user$project$Main$showCellDetail, pos, cell)));
 	});
-var _user$project$Main$view = function (_p28) {
-	var _p29 = _p28;
+var _user$project$Main$view = function (_p29) {
+	var _p30 = _p29;
 	return A2(
 		_elm_lang$svg$Svg$svg,
 		{
@@ -11061,7 +11073,7 @@ var _user$project$Main$view = function (_p28) {
 					function (p, c) {
 						return A2(_user$project$Main$showCell, p, c);
 					}),
-				_p29._0)));
+				_p30._0)));
 };
 var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
 	{model: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update})();

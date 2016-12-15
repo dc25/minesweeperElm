@@ -24,10 +24,10 @@ type alias Board = Dict Pos Cell
 type Msg = LeftPick Pos | RightPick Pos
 
 w : Int
-w = 20
+w = 30
 
 h : Int
-h = 30
+h = 20
 
 cellSize : Int
 cellSize = 25
@@ -161,6 +161,10 @@ adjacents (x,y) =
                            && xx < w
                            && yy < h ) patch
               
+exposeMines : Board -> Board
+exposeMines board = 
+    Dict.map (\_ c -> if (c.mined) then {c|exposed=True} else c) board
+
 exposeCells : Pos -> Board -> Board
 exposeCells pos board =
     let getCell board pos = withDefault (Cell False False False 0) (get pos board)
@@ -171,7 +175,8 @@ exposeCells pos board =
         checklist = if mined || exposed || flagged || count /= 0 then [] else indices
         exposedSelection = (insert pos ({c|exposed = True, mineCount = count}) board)
         exposedNeighbors = List.foldl exposeCells exposedSelection checklist
-    in exposedNeighbors
+        exposedMines = if mined then exposeMines exposedNeighbors else exposedNeighbors
+    in exposedMines
 
 update : Msg -> (Board, Cmd Msg) -> (Board, Cmd Msg)
 update msg (board,_) = 
