@@ -1,4 +1,4 @@
-import List exposing (map2, length, range)
+import List exposing (map2, length, range, filter, map, concatMap)
 import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get)
 import Maybe exposing (withDefault)
@@ -8,7 +8,7 @@ import Svg.Attributes exposing (transform, version, r, cx, cy, x, y, width, heig
 import Svg.Events exposing (onClick, on)
 import Json.Decode as Json
 import Html.Events exposing (onWithOptions)
-import Random.Pcg exposing (Generator, Seed, step, float, map, list,initialSeed)
+import Random.Pcg as R exposing (Generator, Seed, step, float, map, list,initialSeed)
 
 type alias Cell = 
     { mined : Bool 
@@ -32,7 +32,6 @@ h = 80
 cellSize : Int
 cellSize = 25
 
-
 onRightClick message =
   onWithOptions
     "contextmenu"
@@ -42,13 +41,13 @@ onRightClick message =
     (Json.succeed message)
 
 generateCell : Generator Cell
-generateCell = map (\t -> Cell (t < 0.201) False False 0) (float 0.0 1.0)
+generateCell = R.map (\t -> Cell (t < 0.201) False False 0) (float 0.0 1.0)
 
 generateBoard : Generator Board
 generateBoard = 
     let indices = andThen (\r -> andThen (\c -> [(r, c)]) 
                               (range 0 (w-1)) ) (range 0 (h-1)) 
-    in  map (\cs -> fromList (map2 (,) indices cs))
+    in  R.map (\cs -> fromList (map2 (,) indices cs))
             (list (length indices) generateCell)
 
 init : (Board, Cmd Msg)
@@ -143,23 +142,41 @@ showCell pos cell =
          ([ showSquare pos cell ] ++ showCellDetail pos cell)
 
 view : (Board, Cmd Msg) -> Html Msg
-view (model,_) = 
+view (board,_) = 
     svg 
         [ version "1.1"
         , width (toString (w * cellSize))
         , height (toString (h * cellSize))
         ] 
-        (values (Dict.map (\p c -> showCell p c) (model)))
+        (values (Dict.map (\p c -> showCell p c) (board)))
+
+adjacents : Pos -> List Pos
+adjacents (x,y) = 
+    let patch = range (x-1) (x+1) |> concatMap (\xx -> 
+                  range (y-1) (y+1) |> List.map (\yy -> (xx,yy)))
+
+    in filter (\(xx,yy) -> (xx,yy) /= (x,y) 
+                           && xx >= 0 
+                           && yy >= 0 
+                           && xx < w
+                           && yy < h ) patch
+              
+exposeCells : Pos -> Board -> Board
+exposeCells pos board =
+    let c = withDefault (Cell False False False 0) (get pos board)
+    in (insert pos ({c|exposed = True}) board)
 
 update : Msg -> (Board, Cmd Msg) -> (Board, Cmd Msg)
-update msg (model,_) = 
+update msg (board,_) = 
     case msg of
-        (LeftPick pos) ->
-            let c = withDefault (Cell False False False 0) (get pos model)
-            in (insert pos ({c|exposed = True}) model, Cmd.none)
-        (RightPick pos) ->
-            let c = withDefault (Cell False False False 0) (get pos model)
-            in (insert pos ({c|flagged = not (c.flagged)}) model, Cmd.none)
+        LeftPick pos -> 
+            (exposeCells pos board, Cmd.none)
+
+        RightPick pos ->
+            let c = withDefault (Cell False False False 0) (get pos board)
+            in if (c.exposed)
+               then (board, Cmd.none) -- can't flag an exposed cell.
+               else (insert pos ({c|flagged = not (c.flagged)}) board, Cmd.none)
 
 main =
   beginnerProgram { 
