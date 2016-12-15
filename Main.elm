@@ -24,10 +24,10 @@ type alias Board = Dict Pos Cell
 type Msg = LeftPick Pos | RightPick Pos
 
 w : Int
-w = 30
+w = 40
 
 h : Int
-h = 20
+h = 200
 
 cellSize : Int
 cellSize = 25
@@ -156,10 +156,8 @@ adjacents (x,y) =
                   range (y-1) (y+1) |> List.map (\yy -> (xx,yy)))
 
     in filter (\(xx,yy) -> (xx,yy) /= (x,y) 
-                           && xx >= 0 
-                           && yy >= 0 
-                           && xx < w
-                           && yy < h ) patch
+                           && xx >= 0 && yy >= 0 
+                           && xx < w && yy < h ) patch
               
 exposeCells : Pos -> Board -> Board
 exposeCells pos board =
@@ -171,8 +169,9 @@ exposeCells pos board =
         checklist = if mined || exposed || flagged || count /= 0 then [] else indices
         exposedSelection = (insert pos ({c|exposed = True, mineCount = count}) board)
         exposedNeighbors = List.foldl exposeCells exposedSelection checklist
+        exposeMinedCell _ c = if (c.mined) then {c|exposed=True} else c
         exposedMines = if mined 
-                       then Dict.map (\_ c -> if (c.mined) then {c|exposed=True} else c) exposedNeighbors
+                       then Dict.map exposeMinedCell exposedNeighbors
                        else exposedNeighbors
     in exposedMines
 
