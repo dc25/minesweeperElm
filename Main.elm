@@ -4,11 +4,15 @@ import Dict exposing (Dict, fromList, values, insert, get, filter, isEmpty)
 import Maybe exposing (withDefault)
 import Html exposing (Html, beginnerProgram)
 import Svg exposing (Svg, rect, svg, g, text_, line, polygon, circle)
-import Svg.Attributes exposing (transform, version, r, cx, cy, x, y, width, height, style, textAnchor, fill, fontSize, stroke, strokeWidth, x1, y1, x2, y2, points)
-import Svg.Events exposing (onClick, on)
-import Json.Decode as Json
-import Html.Events exposing (onWithOptions)
+import Svg.Attributes exposing (transform, version, r, x, y, width, height, style, textAnchor, fill, fontSize)
+import Svg.Events exposing (onClick)
 import Random.Pcg as R exposing (Generator, Seed, step, float, map, list,initialSeed)
+
+import RightClick exposing (onRightClick)
+import Pos exposing (..)
+import Msg exposing (..)
+import Flag exposing (showFlag)
+import Mine exposing (showMine)
 
 type alias Cell = 
     { mined : Bool 
@@ -17,28 +21,16 @@ type alias Cell =
     , mineCount : Int
     } 
 
-type alias Pos = (Int, Int)
-
 type alias Board = Dict Pos Cell
 
-type Msg = LeftPick Pos | RightPick Pos
-
 w : Int
-w = 40
+w = 32
 
 h : Int
-h = 200
+h = 16
 
 cellSize : Int
 cellSize = 25
-
-onRightClick message =
-  onWithOptions
-    "contextmenu"
-    { stopPropagation = True
-    , preventDefault = True
-    }
-    (Json.succeed message)
 
 generateCell : Generator Cell
 generateCell = R.map (\t -> Cell (t < 0.201) False False 0) (float 0.0 1.0)
@@ -68,49 +60,6 @@ showSquare (xCoord,yCoord) cell =
                , onRightClick (RightPick (xCoord, yCoord))
                ] 
                []
-
-showMine : Pos -> List (Svg Msg)
-showMine pos = 
-    [ polygon [ points "0.65,0.15 0.85,0.35 0.65,0.55 0.45,0.35 " 
-              , fill   "brown"
-              ]
-              [
-              ]
-
-    , circle [ cx "0.45" 
-             , cy "0.55"
-             , r  "0.3"
-             , fill "brown"
-             , onClick (LeftPick pos)
-             , onRightClick (RightPick pos)
-             ] 
-             [
-             ]
-    ]
-
-
-showFlag : Pos -> List (Svg Msg)
-showFlag pos = 
-    [ polygon [ points "0.20,0.40 0.70,0.55 0.70,0.25"
-              , fill   "red"
-              , onClick (LeftPick pos)
-              , onRightClick (RightPick pos)
-              ]
-              [
-              ]
-
-    , line    [ x1 "0.70" 
-              , y1 "0.25" 
-              , x2 "0.70"
-              , y2 "0.85"
-              , strokeWidth ".07"
-              , stroke "black"
-              , onClick (LeftPick pos)
-              , onRightClick (RightPick pos)
-              ] 
-              [
-              ]
-    ]
 
 showText : Pos -> Int -> List (Svg Msg)
 showText pos count = 
