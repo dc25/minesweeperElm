@@ -11,8 +11,8 @@ import Random.Pcg as R exposing (Generator, Seed, step, float, map, list,initial
 import RightClick exposing (onRightClick)
 import Pos exposing (..)
 import Msg exposing (..)
-import Flag exposing (showFlag)
 import Mine exposing (showMine)
+import Flag exposing (showFlag)
 
 type alias Cell = 
     { mined : Bool 
@@ -42,8 +42,8 @@ generateBoard =
     in  R.map (\cs -> fromList (map2 (,) indices cs))
             (list (length indices) generateCell)
 
-init : (Board, Cmd Msg)
-init = let (board, _) = (step generateBoard (initialSeed 0))
+initBoard : (Board, Cmd Msg)
+initBoard = let (board, _) = (step generateBoard (initialSeed 0))
        in (board, Cmd.none)
 
 getColor : Cell -> String
@@ -143,7 +143,7 @@ update msg (board,_) =
 
 main =
   beginnerProgram { 
-      model = init, 
+      model = initBoard, 
       view = view, 
       update = update 
   }
