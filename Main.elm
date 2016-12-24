@@ -2,7 +2,7 @@ import List exposing (map2, length, range, filter, map, concatMap)
 import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get, filter, isEmpty)
 import Maybe exposing (withDefault)
-import Html exposing (Html, beginnerProgram)
+import Html exposing (Html, div, beginnerProgram)
 import Svg exposing (Svg, rect, svg, g, text_, line, polygon, circle)
 import Svg.Attributes exposing (transform, version, r, x, y, width, height, style, textAnchor, fill, fontSize)
 import Svg.Events exposing (onClick)
@@ -13,6 +13,7 @@ import Pos exposing (..)
 import Msg exposing (..)
 import Mine exposing (showMine)
 import Flag exposing (showFlag)
+import Smiley exposing (showFace)
 
 type alias Cell = 
     { mined : Bool 
@@ -95,12 +96,15 @@ gameOver board = not (isEmpty (Dict.filter (\_ {exposed, mined} -> exposed && mi
 
 view : (Board, Cmd Msg) -> Html Msg
 view (board,_) = 
-    svg 
-        [ version "1.1"
-        , width (toString (w * cellSize))
-        , height (toString (h * cellSize))
-        ] 
-        (values (Dict.map (\p c -> showCell p c) (board)))
+    div []
+    ((showFace (gameOver board) )
+     ++ [ svg [ version "1.1"
+              , width (toString (w * cellSize))
+              , height (toString (h * cellSize))
+              ] 
+              (values (Dict.map (\p c -> showCell p c) (board)))
+        ]
+    )
 
 adjacents : Pos -> List Pos
 adjacents (x,y) = 
