@@ -1,6 +1,6 @@
 module Smiley exposing (showFace)
 
-import List exposing (map)
+import List exposing (concatMap, map)
 import Html exposing (Html)
 import Svg exposing (Svg, svg, g, polygon, circle, path)
 import Svg.Attributes exposing (version, height, width, transform, style, stroke, strokeWidth, fill, cx, cy, r, d, points)
@@ -32,7 +32,8 @@ showFace lost =
                              [
                              ]
                     ]
-                    ++ (map (\xc ->
+                    ++ -- eyes
+                       (map (\xc ->
                               circle [ cx (toString xc)
                                      , cy "-0.1"
                                      , r  "0.08"
@@ -44,17 +45,6 @@ showFace lost =
                                      ]
                             ) [0.15, -0.15] 
                        )
-                    ++ (map (\xc ->
-                              circle [ cx (toString xc)
-                                     , cy "-0.1"
-                                     , r  "0.04"
-                                     , style "fill:black"
-                                     ]
-                                     [
-                                     ]
-                            ) [0.15, -0.15] 
-                       )
-
                     ++ [ -- smile/frown
                          path [ d ("M-0.15,0.15 a0.2,0.2 0 0 " ++ (if lost then "1" else "0") ++ " 0.30,0.0")
                               , stroke "black"
@@ -64,6 +54,31 @@ showFace lost =
                               [
                               ]
                        ]
+                   ++ if lost 
+                      then -- eye crosses
+                          let param = [-0.15, 0.15] |> concatMap (\ex -> 
+                                          [-0.1, 0.1] |> concatMap (\dx -> 
+                                              [-0.1, 0.1] |> List.map (\dy -> (ex, dx, dy))))
+                          in  map (\(ex,dx,dy) ->
+                                     path [ d ("M " ++ toString ex ++ " -0.1 l " ++ toString dx ++ " " ++ toString dy)
+                                          , stroke "black"
+                                          , strokeWidth "0.02"
+                                          , fill "none"
+                                          ]
+                                          [
+                                          ]
+                                   ) param
+                      else -- eyeballs
+                          map (\xc ->
+                                circle [ cx (toString xc)
+                                       , cy "-0.1"
+                                       , r  "0.04"
+                                       , style "fill:black"
+                                       ]
+                                       [
+                                       ]
+                              ) [0.15, -0.15] 
+                      
                   )
               ]
        ]
