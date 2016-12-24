@@ -10695,6 +10695,286 @@ var _user$project$Mine$showMine = function (pos) {
 		}
 	};
 };
+var _user$project$Smiley$showFace = function (lost) {
+	var sz = 100;
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$svg$Svg$svg,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$version('1.1'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$width(
+						_elm_lang$core$Basics$toString(sz)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$height(
+							_elm_lang$core$Basics$toString(sz)),
+						_1: {ctor: '[]'}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$g,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$transform(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'    scale (',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(sz),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										', ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(sz),
+											A2(_elm_lang$core$Basics_ops['++'], ') ', 'translate (0.5, 0.5)')))))),
+						_1: {ctor: '[]'}
+					},
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$svg$Svg$circle,
+								{
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$cx('0.0'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$cy('0.0'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$r('0.4'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$style('fill:yellow'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0.02'),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							A2(
+								_elm_lang$core$List$map,
+								function (xc) {
+									return A2(
+										_elm_lang$svg$Svg$circle,
+										{
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$cx(
+												_elm_lang$core$Basics$toString(xc)),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$cy('-0.1'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$r('0.08'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$style('fill:yellow'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0.02'),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										},
+										{ctor: '[]'});
+								},
+								{
+									ctor: '::',
+									_0: 0.15,
+									_1: {
+										ctor: '::',
+										_0: -0.15,
+										_1: {ctor: '[]'}
+									}
+								}),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$svg$Svg$path,
+										{
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$d(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'M-0.15,0.15 a0.2,0.2 0 0 ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														lost ? '1' : '0',
+														' 0.30,0.0'))),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0.02'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								},
+								function () {
+									if (lost) {
+										var param = A2(
+											_elm_lang$core$List$concatMap,
+											function (ex) {
+												return A2(
+													_elm_lang$core$List$concatMap,
+													function (dx) {
+														return A2(
+															_elm_lang$core$List$map,
+															function (dy) {
+																return {ctor: '_Tuple3', _0: ex, _1: dx, _2: dy};
+															},
+															{
+																ctor: '::',
+																_0: -0.1,
+																_1: {
+																	ctor: '::',
+																	_0: 0.1,
+																	_1: {ctor: '[]'}
+																}
+															});
+													},
+													{
+														ctor: '::',
+														_0: -0.1,
+														_1: {
+															ctor: '::',
+															_0: 0.1,
+															_1: {ctor: '[]'}
+														}
+													});
+											},
+											{
+												ctor: '::',
+												_0: -0.15,
+												_1: {
+													ctor: '::',
+													_0: 0.15,
+													_1: {ctor: '[]'}
+												}
+											});
+										return A2(
+											_elm_lang$core$List$map,
+											function (_p0) {
+												var _p1 = _p0;
+												return A2(
+													_elm_lang$svg$Svg$path,
+													{
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$d(
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																'M ',
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	_elm_lang$core$Basics$toString(_p1._0),
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		' -0.1 l ',
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			_elm_lang$core$Basics$toString(_p1._1),
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				' ',
+																				_elm_lang$core$Basics$toString(_p1._2))))))),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0.02'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													},
+													{ctor: '[]'});
+											},
+											param);
+									} else {
+										return A2(
+											_elm_lang$core$List$map,
+											function (xc) {
+												return A2(
+													_elm_lang$svg$Svg$circle,
+													{
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$cx(
+															_elm_lang$core$Basics$toString(xc)),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$cy('-0.1'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$r('0.04'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$style('fill:black'),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													},
+													{ctor: '[]'});
+											},
+											{
+												ctor: '::',
+												_0: 0.15,
+												_1: {
+													ctor: '::',
+													_0: -0.15,
+													_1: {ctor: '[]'}
+												}
+											});
+									}
+								}())))),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	};
+};
 var _user$project$Main$gameOver = function (board) {
 	return !_elm_lang$core$Dict$isEmpty(
 		A2(
@@ -10897,36 +11177,48 @@ var _user$project$Main$h = 16;
 var _user$project$Main$w = 32;
 var _user$project$Main$view = function (_p14) {
 	var _p15 = _p14;
+	var _p16 = _p15._0;
 	return A2(
-		_elm_lang$svg$Svg$svg,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$version('1.1'),
-			_1: {
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$Smiley$showFace(
+				_user$project$Main$gameOver(_p16)),
+			{
 				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$width(
-					_elm_lang$core$Basics$toString(_user$project$Main$w * _user$project$Main$cellSize)),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$height(
-						_elm_lang$core$Basics$toString(_user$project$Main$h * _user$project$Main$cellSize)),
-					_1: {ctor: '[]'}
-				}
-			}
-		},
-		_elm_lang$core$Dict$values(
-			A2(
-				_elm_lang$core$Dict$map,
-				F2(
-					function (p, c) {
-						return A2(_user$project$Main$showCell, p, c);
-					}),
-				_p15._0)));
+				_0: A2(
+					_elm_lang$svg$Svg$svg,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$version('1.1'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$width(
+								_elm_lang$core$Basics$toString(_user$project$Main$w * _user$project$Main$cellSize)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$height(
+									_elm_lang$core$Basics$toString(_user$project$Main$h * _user$project$Main$cellSize)),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					_elm_lang$core$Dict$values(
+						A2(
+							_elm_lang$core$Dict$map,
+							F2(
+								function (p, c) {
+									return A2(_user$project$Main$showCell, p, c);
+								}),
+							_p16))),
+				_1: {ctor: '[]'}
+			}));
 };
-var _user$project$Main$adjacents = function (_p16) {
-	var _p17 = _p16;
-	var _p23 = _p17._1;
-	var _p22 = _p17._0;
+var _user$project$Main$adjacents = function (_p17) {
+	var _p18 = _p17;
+	var _p24 = _p18._1;
+	var _p23 = _p18._0;
 	var patch = A2(
 		_elm_lang$core$List$concatMap,
 		function (xx) {
@@ -10935,18 +11227,18 @@ var _user$project$Main$adjacents = function (_p16) {
 				function (yy) {
 					return {ctor: '_Tuple2', _0: xx, _1: yy};
 				},
-				A2(_elm_lang$core$List$range, _p23 - 1, _p23 + 1));
+				A2(_elm_lang$core$List$range, _p24 - 1, _p24 + 1));
 		},
-		A2(_elm_lang$core$List$range, _p22 - 1, _p22 + 1));
+		A2(_elm_lang$core$List$range, _p23 - 1, _p23 + 1));
 	return A2(
 		_elm_lang$core$List$filter,
-		function (_p18) {
-			var _p19 = _p18;
-			var _p21 = _p19._1;
-			var _p20 = _p19._0;
+		function (_p19) {
+			var _p20 = _p19;
+			var _p22 = _p20._1;
+			var _p21 = _p20._0;
 			return (!_elm_lang$core$Native_Utils.eq(
-				{ctor: '_Tuple2', _0: _p20, _1: _p21},
-				{ctor: '_Tuple2', _0: _p22, _1: _p23})) && ((_elm_lang$core$Native_Utils.cmp(_p20, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p21, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p20, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p21, _user$project$Main$h) < 0))));
+				{ctor: '_Tuple2', _0: _p21, _1: _p22},
+				{ctor: '_Tuple2', _0: _p23, _1: _p24})) && ((_elm_lang$core$Native_Utils.cmp(_p21, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p22, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p21, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p22, _user$project$Main$h) < 0))));
 		},
 		patch);
 };
@@ -11000,17 +11292,17 @@ var _user$project$Main$generateBoard = function () {
 			_user$project$Main$generateCell));
 }();
 var _user$project$Main$initBoard = function () {
-	var _p24 = A2(
+	var _p25 = A2(
 		_mgold$elm_random_pcg$Random_Pcg$step,
 		_user$project$Main$generateBoard,
 		_mgold$elm_random_pcg$Random_Pcg$initialSeed(0));
-	var board = _p24._0;
+	var board = _p25._0;
 	return {ctor: '_Tuple2', _0: board, _1: _elm_lang$core$Platform_Cmd$none};
 }();
 var _user$project$Main$exposeCells = F2(
 	function (pos, board) {
 		var exposeMinedCell = F2(
-			function (_p25, c) {
+			function (_p26, c) {
 				return c.mined ? _elm_lang$core$Native_Utils.update(
 					c,
 					{exposed: true}) : c;
@@ -11024,16 +11316,16 @@ var _user$project$Main$exposeCells = F2(
 					A2(_elm_lang$core$Dict$get, pos, board));
 			});
 		var c = A2(getCell, board, pos);
-		var _p26 = c;
-		var mined = _p26.mined;
-		var exposed = _p26.exposed;
-		var flagged = _p26.flagged;
+		var _p27 = c;
+		var mined = _p27.mined;
+		var exposed = _p27.exposed;
+		var flagged = _p27.flagged;
 		var count = _elm_lang$core$List$length(
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p27) {
-					var _p28 = _p27;
-					return _p28.mined;
+				function (_p28) {
+					var _p29 = _p28;
+					return _p29.mined;
 				},
 				A2(
 					_elm_lang$core$List$map,
@@ -11052,34 +11344,34 @@ var _user$project$Main$exposeCells = F2(
 		return exposedMines;
 	});
 var _user$project$Main$update = F2(
-	function (msg, _p29) {
-		var _p30 = _p29;
-		var _p33 = _p30._0;
-		if (_user$project$Main$gameOver(_p33)) {
-			return {ctor: '_Tuple2', _0: _p33, _1: _elm_lang$core$Platform_Cmd$none};
+	function (msg, _p30) {
+		var _p31 = _p30;
+		var _p34 = _p31._0;
+		if (_user$project$Main$gameOver(_p34)) {
+			return {ctor: '_Tuple2', _0: _p34, _1: _elm_lang$core$Platform_Cmd$none};
 		} else {
-			var _p31 = msg;
-			if (_p31.ctor === 'LeftPick') {
+			var _p32 = msg;
+			if (_p32.ctor === 'LeftPick') {
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_user$project$Main$exposeCells, _p31._0, _p33),
+					_0: A2(_user$project$Main$exposeCells, _p32._0, _p34),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			} else {
-				var _p32 = _p31._0;
+				var _p33 = _p32._0;
 				var c = A2(
 					_elm_lang$core$Maybe$withDefault,
 					A4(_user$project$Main$Cell, false, false, false, 0),
-					A2(_elm_lang$core$Dict$get, _p32, _p33));
-				return c.exposed ? {ctor: '_Tuple2', _0: _p33, _1: _elm_lang$core$Platform_Cmd$none} : {
+					A2(_elm_lang$core$Dict$get, _p33, _p34));
+				return c.exposed ? {ctor: '_Tuple2', _0: _p34, _1: _elm_lang$core$Platform_Cmd$none} : {
 					ctor: '_Tuple2',
 					_0: A3(
 						_elm_lang$core$Dict$insert,
-						_p32,
+						_p33,
 						_elm_lang$core$Native_Utils.update(
 							c,
 							{flagged: !c.flagged}),
-						_p33),
+						_p34),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			}
