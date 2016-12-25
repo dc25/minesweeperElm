@@ -23,6 +23,7 @@ type alias Cell =
     } 
 
 type alias Board = Dict Pos Cell
+type alias Game = {board:Board, seed:Seed}
 
 w : Int
 w = 32
@@ -43,9 +44,9 @@ generateBoard =
     in  R.map (\cs -> fromList (map2 (,) indices cs))
             (list (length indices) generateCell)
 
-initBoard : (Board, Cmd Msg)
-initBoard = let (board, _) = (step generateBoard (initialSeed 0))
-       in (board, Cmd.none)
+initBoard : (Game, Cmd Msg)
+initBoard = let (b,s) = (step generateBoard (initialSeed 0))
+       in ({board=b,seed=s}, Cmd.none)
 
 getColor : Cell -> String
 getColor {exposed} = if exposed then "#909090" else "#AAAAAA"
@@ -96,8 +97,8 @@ gameOver board = not (isEmpty (Dict.filter (\_ {exposed, mined} -> exposed && mi
 
 centerStyle = style "width: 75%; margin: 0 auto;text-align:center;"
 
-view : (Board, Cmd Msg) -> Html Msg
-view (board,_) = 
+view : (Game, Cmd Msg) -> Html Msg
+view ({board},_) = 
     div []
     (   [div [centerStyle] (showFace (gameOver board) )
         ,div [centerStyle] [ svg [ version "1.1"
@@ -135,20 +136,25 @@ exposeCells pos board =
                        else exposedNeighbors
     in exposedMines
 
-update : Msg -> (Board, Cmd Msg) -> (Board, Cmd Msg)
-update msg (board,_) = 
-    if gameOver board 
-    then (board, Cmd.none)
-    else case msg of
-             LeftPick pos -> 
-                 (exposeCells pos board, Cmd.none)
+update : Msg -> (Game, Cmd Msg) -> (Game, Cmd Msg)
+update msg (game,_) = 
+    case msg of
+        LeftPick pos -> 
+            if gameOver game.board
+            then (game, Cmd.none)
+            else ({board=exposeCells pos game.board, seed=game.seed}, Cmd.none)
 
-             RightPick pos ->
-                 let c = withDefault (Cell False False False 0) (get pos board)
+        RightPick pos ->
+            if gameOver game.board
+            then (game, Cmd.none)
+            else let {board, seed} = game
+                     c = withDefault (Cell False False False 0) (get pos board)
                  in if (c.exposed)
-                    then (board, Cmd.none) -- can't flag an exposed cell.
-                    else (insert pos ({c|flagged = not (c.flagged)}) board, Cmd.none)
-             Reset -> (board, Cmd.none)
+                    then (game, Cmd.none) -- can't flag an exposed cell.
+                    else ({board=insert pos ({c|flagged = not (c.flagged)}) board, seed=seed}, Cmd.none)
+
+        Reset -> let (b,s) = step generateBoard game.seed
+                 in ({board=b,seed=s}, Cmd.none)
 
 main =
   beginnerProgram { 
