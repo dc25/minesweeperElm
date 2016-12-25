@@ -49,7 +49,7 @@ initBoard = let (b,s) = (step generateBoard (initialSeed 0))
        in ({board=b,seed=s}, Cmd.none)
 
 getColor : Cell -> String
-getColor {exposed} = if exposed then "#909090" else "#AAAAAA"
+getColor {exposed} = if exposed then "#AAAAAA" else "#CCCCCC"
 
 showSquare : Pos -> Cell -> Svg Msg
 showSquare (xCoord,yCoord) cell = 
@@ -65,17 +65,24 @@ showSquare (xCoord,yCoord) cell =
 
 showText : Pos -> Int -> List (Svg Msg)
 showText pos count = 
-    [ text_ [ x "0.5"
-            , y "0.87" 
-            , fontSize "1.0"
-            , fill "blue"
-            , textAnchor "middle"
-            , onClick (LeftPick pos)
-            , onRightClick (RightPick pos)
-            ] 
-            [ Svg.text (toString count)
-            ]
-    ]
+    let textColor = case count of
+                        1 -> "cyan"
+                        2 -> "green"
+                        3 -> "red"
+                        4 -> "brown"
+                        _ -> "purple"
+
+    in [ text_ [ x "0.5"
+               , y "0.87" 
+               , fontSize "1.0"
+               , fill textColor
+               , textAnchor "middle"
+               , onClick (LeftPick pos)
+               , onRightClick (RightPick pos)
+               ] 
+               [ Svg.text (toString count)
+               ]
+       ]
 
 showCellDetail : Pos -> Cell -> List (Svg Msg)
 showCellDetail pos {mined, exposed, flagged, mineCount} = 
