@@ -10990,6 +10990,21 @@ var _user$project$Main$gameOver = function (board) {
 };
 var _user$project$Main$showText = F2(
 	function (pos, count) {
+		var textColor = function () {
+			var _p3 = count;
+			switch (_p3) {
+				case 1:
+					return 'cyan';
+				case 2:
+					return 'green';
+				case 3:
+					return 'red';
+				case 4:
+					return 'brown';
+				default:
+					return 'purple';
+			}
+		}();
 		return {
 			ctor: '::',
 			_0: A2(
@@ -11005,7 +11020,7 @@ var _user$project$Main$showText = F2(
 							_0: _elm_lang$svg$Svg_Attributes$fontSize('1.0'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$fill('blue'),
+								_0: _elm_lang$svg$Svg_Attributes$fill(textColor),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
@@ -11035,39 +11050,39 @@ var _user$project$Main$showText = F2(
 		};
 	});
 var _user$project$Main$showCellDetail = F2(
-	function (pos, _p3) {
-		var _p4 = _p3;
-		var _p6 = _p4.mineCount;
-		var _p5 = {
+	function (pos, _p4) {
+		var _p5 = _p4;
+		var _p7 = _p5.mineCount;
+		var _p6 = {
 			ctor: '_Tuple4',
-			_0: _p4.mined,
-			_1: _p4.exposed,
-			_2: _p4.flagged,
-			_3: _elm_lang$core$Native_Utils.eq(0, _p6)
+			_0: _p5.mined,
+			_1: _p5.exposed,
+			_2: _p5.flagged,
+			_3: _elm_lang$core$Native_Utils.eq(0, _p7)
 		};
-		_v2_3:
+		_v3_3:
 		do {
-			_v2_0:
+			_v3_0:
 			do {
-				if (_p5._1 === true) {
-					if (_p5._2 === true) {
-						break _v2_0;
+				if (_p6._1 === true) {
+					if (_p6._2 === true) {
+						break _v3_0;
 					} else {
-						if (_p5._0 === true) {
+						if (_p6._0 === true) {
 							return _user$project$Mine$showMine(pos);
 						} else {
-							if (_p5._3 === false) {
-								return A2(_user$project$Main$showText, pos, _p6);
+							if (_p6._3 === false) {
+								return A2(_user$project$Main$showText, pos, _p7);
 							} else {
-								break _v2_3;
+								break _v3_3;
 							}
 						}
 					}
 				} else {
-					if (_p5._2 === true) {
-						break _v2_0;
+					if (_p6._2 === true) {
+						break _v3_0;
 					} else {
-						break _v2_3;
+						break _v3_3;
 					}
 				}
 			} while(false);
@@ -11075,15 +11090,15 @@ var _user$project$Main$showCellDetail = F2(
 		} while(false);
 		return {ctor: '[]'};
 	});
-var _user$project$Main$getColor = function (_p7) {
-	var _p8 = _p7;
-	return _p8.exposed ? '#909090' : '#AAAAAA';
+var _user$project$Main$getColor = function (_p8) {
+	var _p9 = _p8;
+	return _p9.exposed ? '#AAAAAA' : '#CCCCCC';
 };
 var _user$project$Main$showSquare = F2(
-	function (_p9, cell) {
-		var _p10 = _p9;
-		var _p12 = _p10._1;
-		var _p11 = _p10._0;
+	function (_p10, cell) {
+		var _p11 = _p10;
+		var _p13 = _p11._1;
+		var _p12 = _p11._0;
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			{
@@ -11109,12 +11124,12 @@ var _user$project$Main$showSquare = F2(
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Events$onClick(
 										_user$project$Msg$LeftPick(
-											{ctor: '_Tuple2', _0: _p11, _1: _p12})),
+											{ctor: '_Tuple2', _0: _p12, _1: _p13})),
 									_1: {
 										ctor: '::',
 										_0: _user$project$RightClick$onRightClick(
 											_user$project$Msg$RightPick(
-												{ctor: '_Tuple2', _0: _p11, _1: _p12})),
+												{ctor: '_Tuple2', _0: _p12, _1: _p13})),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -11128,9 +11143,9 @@ var _user$project$Main$showSquare = F2(
 var _user$project$Main$cellSize = 25;
 var _user$project$Main$showCell = F2(
 	function (pos, cell) {
-		var _p13 = pos;
-		var x = _p13._0;
-		var y = _p13._1;
+		var _p14 = pos;
+		var x = _p14._0;
+		var y = _p14._1;
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{
@@ -11177,9 +11192,9 @@ var _user$project$Main$showCell = F2(
 	});
 var _user$project$Main$h = 16;
 var _user$project$Main$w = 32;
-var _user$project$Main$view = function (_p14) {
-	var _p15 = _p14;
-	var _p16 = _p15._0.board;
+var _user$project$Main$view = function (_p15) {
+	var _p16 = _p15;
+	var _p17 = _p16._0.board;
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -11193,7 +11208,7 @@ var _user$project$Main$view = function (_p14) {
 					_1: {ctor: '[]'}
 				},
 				_user$project$Smiley$showFace(
-					_user$project$Main$gameOver(_p16))),
+					_user$project$Main$gameOver(_p17))),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -11229,7 +11244,7 @@ var _user$project$Main$view = function (_p14) {
 										function (p, c) {
 											return A2(_user$project$Main$showCell, p, c);
 										}),
-									_p16))),
+									_p17))),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -11262,10 +11277,10 @@ var _user$project$Main$view = function (_p14) {
 			}
 		});
 };
-var _user$project$Main$adjacents = function (_p17) {
-	var _p18 = _p17;
-	var _p24 = _p18._1;
-	var _p23 = _p18._0;
+var _user$project$Main$adjacents = function (_p18) {
+	var _p19 = _p18;
+	var _p25 = _p19._1;
+	var _p24 = _p19._0;
 	var patch = A2(
 		_elm_lang$core$List$concatMap,
 		function (xx) {
@@ -11274,18 +11289,18 @@ var _user$project$Main$adjacents = function (_p17) {
 				function (yy) {
 					return {ctor: '_Tuple2', _0: xx, _1: yy};
 				},
-				A2(_elm_lang$core$List$range, _p24 - 1, _p24 + 1));
+				A2(_elm_lang$core$List$range, _p25 - 1, _p25 + 1));
 		},
-		A2(_elm_lang$core$List$range, _p23 - 1, _p23 + 1));
+		A2(_elm_lang$core$List$range, _p24 - 1, _p24 + 1));
 	return A2(
 		_elm_lang$core$List$filter,
-		function (_p19) {
-			var _p20 = _p19;
-			var _p22 = _p20._1;
-			var _p21 = _p20._0;
+		function (_p20) {
+			var _p21 = _p20;
+			var _p23 = _p21._1;
+			var _p22 = _p21._0;
 			return (!_elm_lang$core$Native_Utils.eq(
-				{ctor: '_Tuple2', _0: _p21, _1: _p22},
-				{ctor: '_Tuple2', _0: _p23, _1: _p24})) && ((_elm_lang$core$Native_Utils.cmp(_p21, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p22, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p21, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p22, _user$project$Main$h) < 0))));
+				{ctor: '_Tuple2', _0: _p22, _1: _p23},
+				{ctor: '_Tuple2', _0: _p24, _1: _p25})) && ((_elm_lang$core$Native_Utils.cmp(_p22, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p23, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p22, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p23, _user$project$Main$h) < 0))));
 		},
 		patch);
 };
@@ -11339,12 +11354,12 @@ var _user$project$Main$generateBoard = function () {
 			_user$project$Main$generateCell));
 }();
 var _user$project$Main$initBoard = function () {
-	var _p25 = A2(
+	var _p26 = A2(
 		_mgold$elm_random_pcg$Random_Pcg$step,
 		_user$project$Main$generateBoard,
 		_mgold$elm_random_pcg$Random_Pcg$initialSeed(0));
-	var b = _p25._0;
-	var s = _p25._1;
+	var b = _p26._0;
+	var s = _p26._1;
 	return {
 		ctor: '_Tuple2',
 		_0: {board: b, seed: s},
@@ -11354,7 +11369,7 @@ var _user$project$Main$initBoard = function () {
 var _user$project$Main$exposeCells = F2(
 	function (pos, board) {
 		var exposeMinedCell = F2(
-			function (_p26, c) {
+			function (_p27, c) {
 				return c.mined ? _elm_lang$core$Native_Utils.update(
 					c,
 					{exposed: true}) : c;
@@ -11368,16 +11383,16 @@ var _user$project$Main$exposeCells = F2(
 					A2(_elm_lang$core$Dict$get, pos, board));
 			});
 		var c = A2(getCell, board, pos);
-		var _p27 = c;
-		var mined = _p27.mined;
-		var exposed = _p27.exposed;
-		var flagged = _p27.flagged;
+		var _p28 = c;
+		var mined = _p28.mined;
+		var exposed = _p28.exposed;
+		var flagged = _p28.flagged;
 		var count = _elm_lang$core$List$length(
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p28) {
-					var _p29 = _p28;
-					return _p29.mined;
+				function (_p29) {
+					var _p30 = _p29;
+					return _p30.mined;
 				},
 				A2(
 					_elm_lang$core$List$map,
@@ -11396,38 +11411,38 @@ var _user$project$Main$exposeCells = F2(
 		return exposedMines;
 	});
 var _user$project$Main$update = F2(
-	function (msg, _p30) {
-		var _p31 = _p30;
-		var _p36 = _p31._0;
-		var _p32 = msg;
-		switch (_p32.ctor) {
+	function (msg, _p31) {
+		var _p32 = _p31;
+		var _p37 = _p32._0;
+		var _p33 = msg;
+		switch (_p33.ctor) {
 			case 'LeftPick':
-				return _user$project$Main$gameOver(_p36.board) ? {ctor: '_Tuple2', _0: _p36, _1: _elm_lang$core$Platform_Cmd$none} : {
+				return _user$project$Main$gameOver(_p37.board) ? {ctor: '_Tuple2', _0: _p37, _1: _elm_lang$core$Platform_Cmd$none} : {
 					ctor: '_Tuple2',
 					_0: {
-						board: A2(_user$project$Main$exposeCells, _p32._0, _p36.board),
-						seed: _p36.seed
+						board: A2(_user$project$Main$exposeCells, _p33._0, _p37.board),
+						seed: _p37.seed
 					},
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'RightPick':
-				var _p34 = _p32._0;
-				if (_user$project$Main$gameOver(_p36.board)) {
-					return {ctor: '_Tuple2', _0: _p36, _1: _elm_lang$core$Platform_Cmd$none};
+				var _p35 = _p33._0;
+				if (_user$project$Main$gameOver(_p37.board)) {
+					return {ctor: '_Tuple2', _0: _p37, _1: _elm_lang$core$Platform_Cmd$none};
 				} else {
-					var _p33 = _p36;
-					var board = _p33.board;
-					var seed = _p33.seed;
+					var _p34 = _p37;
+					var board = _p34.board;
+					var seed = _p34.seed;
 					var c = A2(
 						_elm_lang$core$Maybe$withDefault,
 						A4(_user$project$Main$Cell, false, false, false, 0),
-						A2(_elm_lang$core$Dict$get, _p34, board));
-					return c.exposed ? {ctor: '_Tuple2', _0: _p36, _1: _elm_lang$core$Platform_Cmd$none} : {
+						A2(_elm_lang$core$Dict$get, _p35, board));
+					return c.exposed ? {ctor: '_Tuple2', _0: _p37, _1: _elm_lang$core$Platform_Cmd$none} : {
 						ctor: '_Tuple2',
 						_0: {
 							board: A3(
 								_elm_lang$core$Dict$insert,
-								_p34,
+								_p35,
 								_elm_lang$core$Native_Utils.update(
 									c,
 									{flagged: !c.flagged}),
@@ -11438,9 +11453,9 @@ var _user$project$Main$update = F2(
 					};
 				}
 			default:
-				var _p35 = A2(_mgold$elm_random_pcg$Random_Pcg$step, _user$project$Main$generateBoard, _p36.seed);
-				var b = _p35._0;
-				var s = _p35._1;
+				var _p36 = A2(_mgold$elm_random_pcg$Random_Pcg$step, _user$project$Main$generateBoard, _p37.seed);
+				var b = _p36._0;
+				var s = _p36._1;
 				return {
 					ctor: '_Tuple2',
 					_0: {board: b, seed: s},
