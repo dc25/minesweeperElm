@@ -2,7 +2,7 @@ import List exposing (map2, length, range, filter, map, concatMap)
 import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get, filter, isEmpty)
 import Maybe exposing (withDefault)
-import Html exposing (Html, div, beginnerProgram)
+import Html exposing (Html, div, text, button, beginnerProgram)
 import Svg exposing (Svg, rect, svg, g, text_, line, polygon, circle)
 import Svg.Attributes exposing (transform, version, r, x, y, width, height, style, textAnchor, fill, fontSize)
 import Svg.Events exposing (onClick)
@@ -94,15 +94,19 @@ showCell pos cell =
 gameOver : Board -> Bool
 gameOver board = not (isEmpty (Dict.filter (\_ {exposed, mined} -> exposed && mined ) board))
 
+centerStyle = style "width: 75%; margin: 0 auto;text-align:center;"
+
 view : (Board, Cmd Msg) -> Html Msg
 view (board,_) = 
     div []
-    ((showFace (gameOver board) )
-     ++ [ svg [ version "1.1"
-              , width (toString (w * cellSize))
-              , height (toString (h * cellSize))
-              ] 
-              (values (Dict.map (\p c -> showCell p c) (board)))
+    (   [div [centerStyle] (showFace (gameOver board) )
+        ,div [centerStyle] [ svg [ version "1.1"
+                      , width (toString (w * cellSize))
+                      , height (toString (h * cellSize))
+                      ]
+                      (values (Dict.map (\p c -> showCell p c) (board)))
+                ]
+        ,div [centerStyle] [ button [onClick Reset] [text "reset"] ]
         ]
     )
 
@@ -144,6 +148,7 @@ update msg (board,_) =
                  in if (c.exposed)
                     then (board, Cmd.none) -- can't flag an exposed cell.
                     else (insert pos ({c|flagged = not (c.flagged)}) board, Cmd.none)
+             Reset -> (board, Cmd.none)
 
 main =
   beginnerProgram { 
