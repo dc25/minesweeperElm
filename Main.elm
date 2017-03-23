@@ -32,7 +32,7 @@ h : Int
 h = 16
 
 cellSize : Int
-cellSize = 25
+cellSize = 20
 
 generateCell : Generator Cell
 generateCell = R.map (\t -> Cell (t < 0.201) False False 0) (float 0.0 1.0)
