@@ -31,7 +31,7 @@ w : Int
 w = 32
 
 h : Int
-h = 320
+h = 16
 
 cellSize : Int
 cellSize = 20
