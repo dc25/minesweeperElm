@@ -2,7 +2,7 @@ import List exposing (map2, length, range, filter, map, concatMap)
 import List.Extra exposing (andThen)
 import Dict exposing (Dict, fromList, values, insert, get, filter, isEmpty)
 import Maybe exposing (withDefault)
-import Html exposing (Html, div, text, button, beginnerProgram)
+import Html exposing (Html, div, text, button, program)
 import Svg exposing (Svg, rect, svg, g, text_, line, polygon, circle)
 import Svg.Attributes exposing (transform, version, r, x, y, width, height, style, textAnchor, fill, fontSize)
 import Svg.Events exposing (onClick)
@@ -14,6 +14,8 @@ import Msg exposing (..)
 import Mine exposing (showMine)
 import Flag exposing (showFlag)
 import Smiley exposing (showFace)
+import Time exposing (now)
+import Task exposing (perform)
 
 type alias Cell = 
     { mined : Bool 
@@ -29,7 +31,7 @@ w : Int
 w = 32
 
 h : Int
-h = 160
+h = 320
 
 cellSize : Int
 cellSize = 20
@@ -43,10 +45,6 @@ generateBoard =
                               (range 0 (w-1)) ) (range 0 (h-1)) 
     in  R.map (\cs -> fromList (map2 (,) indices cs))
             (list (length indices) generateCell)
-
-initBoard : (Game, Cmd Msg)
-initBoard = let (b,s) = (step generateBoard (initialSeed 0))
-       in ({board=b,seed=s}, Cmd.none)
 
 getColor : Cell -> String
 getColor {exposed} = if exposed then "#AAAAAA" else "#CCCCCC"
@@ -104,8 +102,8 @@ gameOver board = not (isEmpty (Dict.filter (\_ {exposed, mined} -> exposed && mi
 
 centerStyle = style "width: 75%; margin: 0 auto;text-align:center;"
 
-view : (Game, Cmd Msg) -> Html Msg
-view ({board},_) = 
+view : Game -> Html Msg
+view ({board}) = 
     div []
     (   [div [centerStyle] (showFace (gameOver board) )
         ,div [centerStyle] [ svg [ version "1.1"
@@ -143,9 +141,13 @@ exposeCells pos board =
                        else exposedNeighbors
     in exposedMines
 
-update : Msg -> (Game, Cmd Msg) -> (Game, Cmd Msg)
-update msg (game,_) = 
+update : Msg -> Game -> (Game, Cmd Msg)
+update msg game = 
     case msg of
+        InitBoard s -> 
+            let (b,ns) = (step generateBoard (initialSeed s))
+            in ({board=b,seed=ns}, Cmd.none)
+
         LeftPick pos -> 
             if gameOver game.board
             then (game, Cmd.none)
@@ -163,9 +165,12 @@ update msg (game,_) =
         Reset -> let (b,s) = step generateBoard game.seed
                  in ({board=b,seed=s}, Cmd.none)
 
+
+initBoard = perform (\t -> InitBoard (round t)) now
+
 main =
-  beginnerProgram { 
-      model = initBoard, 
-      view = view, 
-      update = update 
-  }
+    program { init = ({board=Dict.empty,seed=initialSeed 0}, initBoard)
+            , view = view
+            , update = update
+            , subscriptions = \m -> Sub.none 
+            }
