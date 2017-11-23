@@ -10,28 +10,14 @@ import Random.Pcg as R exposing (Generator, Seed, step, float, map, list,initial
 
 import RightClick exposing (onRightClick)
 import Pos exposing (..)
+import Game exposing (..)
 import Msg exposing (..)
 import Mine exposing (showMine)
 import Flag exposing (showFlag)
 import Smiley exposing (showFace)
 import Time exposing (now)
 import Task exposing (perform)
-
-type alias Cell = 
-    { mined : Bool 
-    , exposed : Bool
-    , flagged : Bool
-    , mineCount : Int
-    } 
-
-type alias Board = Dict Pos Cell
-type alias Game = {board:Board, seed:Seed}
-
-w : Int
-w = 32
-
-h : Int
-h = 160
+import Update exposing (exposeCells, gameOver)
 
 cellSize : Int
 cellSize = 20
@@ -97,9 +83,6 @@ showCell pos cell =
          ]
          ([ showSquare pos cell ] ++ showCellDetail pos cell)
 
-gameOver : Board -> Bool
-gameOver board = not (isEmpty (Dict.filter (\_ {exposed, mined} -> exposed && mined ) board))
-
 centerStyle = style "width: 75%; margin: 0 auto;text-align:center;"
 
 view : Game -> Html Msg
@@ -115,31 +98,6 @@ view ({board}) =
         ,div [centerStyle] [ button [onClick Reset] [text "reset"] ]
         ]
     )
-
-adjacents : Pos -> List Pos
-adjacents (x,y) = 
-    let patch = range (x-1) (x+1) |> concatMap (\xx -> 
-                  range (y-1) (y+1) |> List.map (\yy -> (xx,yy)))
-
-    in List.filter (\(xx,yy) ->    (xx,yy) /= (x,y) 
-                                && xx >= 0 && yy >= 0 
-                                && xx < w && yy < h ) patch
-              
-exposeCells : Pos -> Board -> Board
-exposeCells pos board =
-    let getCell board pos = withDefault (Cell False False False 0) (get pos board)
-        c = getCell board pos 
-        indices = adjacents pos
-        count = length (List.filter (\{mined} -> mined) (List.map (getCell board) indices))
-        {mined,exposed,flagged} = c
-        checklist = if mined || exposed || flagged || count /= 0 then [] else indices
-        exposedSelection = (insert pos ({c|exposed = True, mineCount = count}) board)
-        exposedNeighbors = List.foldl exposeCells exposedSelection checklist
-        exposeMinedCell _ c = if (c.mined) then {c|exposed=True} else c
-        exposedMines = if mined 
-                       then Dict.map exposeMinedCell exposedNeighbors
-                       else exposedNeighbors
-    in exposedMines
 
 update : Msg -> Game -> (Game, Cmd Msg)
 update msg game = 
@@ -164,7 +122,6 @@ update msg game =
 
         Reset -> let (b,s) = step generateBoard game.seed
                  in ({board=b,seed=s}, Cmd.none)
-
 
 initBoard = perform (\t -> InitBoard (round t)) now
 
