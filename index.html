@@ -10660,6 +10660,16 @@ var _user$project$Flag$showFlag = function (pos) {
 		}
 	};
 };
+var _user$project$Game$h = 160;
+var _user$project$Game$w = 32;
+var _user$project$Game$Cell = F4(
+	function (a, b, c, d) {
+		return {mined: a, exposed: b, flagged: c, mineCount: d};
+	});
+var _user$project$Game$Game = F2(
+	function (a, b) {
+		return {board: a, seed: b};
+	});
 var _user$project$Mine$showMine = function (pos) {
 	return {
 		ctor: '::',
@@ -10991,15 +11001,7 @@ var _user$project$Smiley$showFace = function (lost) {
 		_1: {ctor: '[]'}
 	};
 };
-var _user$project$Main$initBoard = A2(
-	_elm_lang$core$Task$perform,
-	function (t) {
-		return _user$project$Msg$InitBoard(
-			_elm_lang$core$Basics$round(t));
-	},
-	_elm_lang$core$Time$now);
-var _user$project$Main$centerStyle = _elm_lang$svg$Svg_Attributes$style('width: 75%; margin: 0 auto;text-align:center;');
-var _user$project$Main$gameOver = function (board) {
+var _user$project$Update$gameOver = function (board) {
 	return !_elm_lang$core$Dict$isEmpty(
 		A2(
 			_elm_lang$core$Dict$filter,
@@ -11010,11 +11012,135 @@ var _user$project$Main$gameOver = function (board) {
 				}),
 			board));
 };
+var _user$project$Update$adjacents = function (_p3) {
+	var _p4 = _p3;
+	var _p10 = _p4._1;
+	var _p9 = _p4._0;
+	var patch = A2(
+		_elm_lang$core$List$concatMap,
+		function (xx) {
+			return A2(
+				_elm_lang$core$List$map,
+				function (yy) {
+					return {ctor: '_Tuple2', _0: xx, _1: yy};
+				},
+				A2(_elm_lang$core$List$range, _p10 - 1, _p10 + 1));
+		},
+		A2(_elm_lang$core$List$range, _p9 - 1, _p9 + 1));
+	return A2(
+		_elm_lang$core$List$filter,
+		function (_p5) {
+			var _p6 = _p5;
+			var _p8 = _p6._1;
+			var _p7 = _p6._0;
+			return (!_elm_lang$core$Native_Utils.eq(
+				{ctor: '_Tuple2', _0: _p7, _1: _p8},
+				{ctor: '_Tuple2', _0: _p9, _1: _p10})) && ((_elm_lang$core$Native_Utils.cmp(_p7, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p8, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p7, _user$project$Game$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p8, _user$project$Game$h) < 0))));
+		},
+		patch);
+};
+var _user$project$Update$exposeCells = F2(
+	function (pos, board) {
+		var exposeMinedCell = F2(
+			function (_p11, c) {
+				return c.mined ? _elm_lang$core$Native_Utils.update(
+					c,
+					{exposed: true}) : c;
+			});
+		var indices = _user$project$Update$adjacents(pos);
+		var getCell = F2(
+			function (board, pos) {
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					A4(_user$project$Game$Cell, false, false, false, 0),
+					A2(_elm_lang$core$Dict$get, pos, board));
+			});
+		var c = A2(getCell, board, pos);
+		var _p12 = c;
+		var mined = _p12.mined;
+		var exposed = _p12.exposed;
+		var flagged = _p12.flagged;
+		var count = _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p13) {
+					var _p14 = _p13;
+					return _p14.mined;
+				},
+				A2(
+					_elm_lang$core$List$map,
+					getCell(board),
+					indices)));
+		var checklist = (mined || (exposed || (flagged || (!_elm_lang$core$Native_Utils.eq(count, 0))))) ? {ctor: '[]'} : indices;
+		var exposedSelection = A3(
+			_elm_lang$core$Dict$insert,
+			pos,
+			_elm_lang$core$Native_Utils.update(
+				c,
+				{exposed: true, mineCount: count}),
+			board);
+		var exposedNeighbors = A3(_elm_lang$core$List$foldl, _user$project$Update$exposeCells, exposedSelection, checklist);
+		var exposedMines = mined ? A2(_elm_lang$core$Dict$map, exposeMinedCell, exposedNeighbors) : exposedNeighbors;
+		return exposedMines;
+	});
+var _user$project$Update$generateCell = A2(
+	_mgold$elm_random_pcg$Random_Pcg$map,
+	function (t) {
+		return A4(
+			_user$project$Game$Cell,
+			_elm_lang$core$Native_Utils.cmp(t, 0.201) < 0,
+			false,
+			false,
+			0);
+	},
+	A2(_mgold$elm_random_pcg$Random_Pcg$float, 0.0, 1.0));
+var _user$project$Update$generateBoard = function () {
+	var indices = A2(
+		_elm_community$list_extra$List_Extra$andThen,
+		function (y) {
+			return A2(
+				_elm_community$list_extra$List_Extra$andThen,
+				function (x) {
+					return {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: x, _1: y},
+						_1: {ctor: '[]'}
+					};
+				},
+				A2(_elm_lang$core$List$range, 0, _user$project$Game$w - 1));
+		},
+		A2(_elm_lang$core$List$range, 0, _user$project$Game$h - 1));
+	return A2(
+		_mgold$elm_random_pcg$Random_Pcg$map,
+		function (cs) {
+			return _elm_lang$core$Dict$fromList(
+				A3(
+					_elm_lang$core$List$map2,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					indices,
+					cs));
+		},
+		A2(
+			_mgold$elm_random_pcg$Random_Pcg$list,
+			_elm_lang$core$List$length(indices),
+			_user$project$Update$generateCell));
+}();
+var _user$project$Main$initBoard = A2(
+	_elm_lang$core$Task$perform,
+	function (t) {
+		return _user$project$Msg$InitBoard(
+			_elm_lang$core$Basics$round(t));
+	},
+	_elm_lang$core$Time$now);
+var _user$project$Main$centerStyle = _elm_lang$svg$Svg_Attributes$style('width: 75%; margin: 0 auto;text-align:center;');
 var _user$project$Main$showText = F2(
 	function (pos, count) {
 		var textColor = function () {
-			var _p3 = count;
-			switch (_p3) {
+			var _p0 = count;
+			switch (_p0) {
 				case 1:
 					return 'cyan';
 				case 2:
@@ -11072,39 +11198,39 @@ var _user$project$Main$showText = F2(
 		};
 	});
 var _user$project$Main$showCellDetail = F2(
-	function (pos, _p4) {
-		var _p5 = _p4;
-		var _p7 = _p5.mineCount;
-		var _p6 = {
+	function (pos, _p1) {
+		var _p2 = _p1;
+		var _p4 = _p2.mineCount;
+		var _p3 = {
 			ctor: '_Tuple4',
-			_0: _p5.mined,
-			_1: _p5.exposed,
-			_2: _p5.flagged,
-			_3: _elm_lang$core$Native_Utils.eq(0, _p7)
+			_0: _p2.mined,
+			_1: _p2.exposed,
+			_2: _p2.flagged,
+			_3: _elm_lang$core$Native_Utils.eq(0, _p4)
 		};
-		_v3_3:
+		_v2_3:
 		do {
-			_v3_0:
+			_v2_0:
 			do {
-				if (_p6._1 === true) {
-					if (_p6._2 === true) {
-						break _v3_0;
+				if (_p3._1 === true) {
+					if (_p3._2 === true) {
+						break _v2_0;
 					} else {
-						if (_p6._0 === true) {
+						if (_p3._0 === true) {
 							return _user$project$Mine$showMine(pos);
 						} else {
-							if (_p6._3 === false) {
-								return A2(_user$project$Main$showText, pos, _p7);
+							if (_p3._3 === false) {
+								return A2(_user$project$Main$showText, pos, _p4);
 							} else {
-								break _v3_3;
+								break _v2_3;
 							}
 						}
 					}
 				} else {
-					if (_p6._2 === true) {
-						break _v3_0;
+					if (_p3._2 === true) {
+						break _v2_0;
 					} else {
-						break _v3_3;
+						break _v2_3;
 					}
 				}
 			} while(false);
@@ -11112,15 +11238,15 @@ var _user$project$Main$showCellDetail = F2(
 		} while(false);
 		return {ctor: '[]'};
 	});
-var _user$project$Main$getColor = function (_p8) {
-	var _p9 = _p8;
-	return _p9.exposed ? '#AAAAAA' : '#CCCCCC';
+var _user$project$Main$getColor = function (_p5) {
+	var _p6 = _p5;
+	return _p6.exposed ? '#AAAAAA' : '#CCCCCC';
 };
 var _user$project$Main$showSquare = F2(
-	function (_p10, cell) {
-		var _p11 = _p10;
-		var _p13 = _p11._1;
-		var _p12 = _p11._0;
+	function (_p7, cell) {
+		var _p8 = _p7;
+		var _p10 = _p8._1;
+		var _p9 = _p8._0;
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			{
@@ -11146,12 +11272,12 @@ var _user$project$Main$showSquare = F2(
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Events$onClick(
 										_user$project$Msg$LeftPick(
-											{ctor: '_Tuple2', _0: _p12, _1: _p13})),
+											{ctor: '_Tuple2', _0: _p9, _1: _p10})),
 									_1: {
 										ctor: '::',
 										_0: _user$project$RightClick$onRightClick(
 											_user$project$Msg$RightPick(
-												{ctor: '_Tuple2', _0: _p12, _1: _p13})),
+												{ctor: '_Tuple2', _0: _p9, _1: _p10})),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -11162,12 +11288,120 @@ var _user$project$Main$showSquare = F2(
 			},
 			{ctor: '[]'});
 	});
+var _user$project$Main$generateCell = A2(
+	_mgold$elm_random_pcg$Random_Pcg$map,
+	function (t) {
+		return A4(
+			_user$project$Game$Cell,
+			_elm_lang$core$Native_Utils.cmp(t, 0.201) < 0,
+			false,
+			false,
+			0);
+	},
+	A2(_mgold$elm_random_pcg$Random_Pcg$float, 0.0, 1.0));
+var _user$project$Main$generateBoard = function () {
+	var indices = A2(
+		_elm_community$list_extra$List_Extra$andThen,
+		function (y) {
+			return A2(
+				_elm_community$list_extra$List_Extra$andThen,
+				function (x) {
+					return {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: x, _1: y},
+						_1: {ctor: '[]'}
+					};
+				},
+				A2(_elm_lang$core$List$range, 0, _user$project$Game$w - 1));
+		},
+		A2(_elm_lang$core$List$range, 0, _user$project$Game$h - 1));
+	return A2(
+		_mgold$elm_random_pcg$Random_Pcg$map,
+		function (cs) {
+			return _elm_lang$core$Dict$fromList(
+				A3(
+					_elm_lang$core$List$map2,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					indices,
+					cs));
+		},
+		A2(
+			_mgold$elm_random_pcg$Random_Pcg$list,
+			_elm_lang$core$List$length(indices),
+			_user$project$Main$generateCell));
+}();
+var _user$project$Main$update = F2(
+	function (msg, game) {
+		var _p11 = msg;
+		switch (_p11.ctor) {
+			case 'InitBoard':
+				var _p12 = A2(
+					_mgold$elm_random_pcg$Random_Pcg$step,
+					_user$project$Main$generateBoard,
+					_mgold$elm_random_pcg$Random_Pcg$initialSeed(_p11._0));
+				var b = _p12._0;
+				var ns = _p12._1;
+				return {
+					ctor: '_Tuple2',
+					_0: {board: b, seed: ns},
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'LeftPick':
+				return _user$project$Update$gameOver(game.board) ? {ctor: '_Tuple2', _0: game, _1: _elm_lang$core$Platform_Cmd$none} : {
+					ctor: '_Tuple2',
+					_0: {
+						board: A2(_user$project$Update$exposeCells, _p11._0, game.board),
+						seed: game.seed
+					},
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'RightPick':
+				var _p14 = _p11._0;
+				if (_user$project$Update$gameOver(game.board)) {
+					return {ctor: '_Tuple2', _0: game, _1: _elm_lang$core$Platform_Cmd$none};
+				} else {
+					var _p13 = game;
+					var board = _p13.board;
+					var seed = _p13.seed;
+					var c = A2(
+						_elm_lang$core$Maybe$withDefault,
+						A4(_user$project$Game$Cell, false, false, false, 0),
+						A2(_elm_lang$core$Dict$get, _p14, board));
+					return c.exposed ? {ctor: '_Tuple2', _0: game, _1: _elm_lang$core$Platform_Cmd$none} : {
+						ctor: '_Tuple2',
+						_0: {
+							board: A3(
+								_elm_lang$core$Dict$insert,
+								_p14,
+								_elm_lang$core$Native_Utils.update(
+									c,
+									{flagged: !c.flagged}),
+								board),
+							seed: seed
+						},
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+			default:
+				var _p15 = A2(_mgold$elm_random_pcg$Random_Pcg$step, _user$project$Main$generateBoard, game.seed);
+				var b = _p15._0;
+				var s = _p15._1;
+				return {
+					ctor: '_Tuple2',
+					_0: {board: b, seed: s},
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
 var _user$project$Main$cellSize = 20;
 var _user$project$Main$showCell = F2(
 	function (pos, cell) {
-		var _p14 = pos;
-		var x = _p14._0;
-		var y = _p14._1;
+		var _p16 = pos;
+		var x = _p16._0;
+		var y = _p16._1;
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{
@@ -11212,11 +11446,9 @@ var _user$project$Main$showCell = F2(
 				},
 				A2(_user$project$Main$showCellDetail, pos, cell)));
 	});
-var _user$project$Main$h = 160;
-var _user$project$Main$w = 32;
-var _user$project$Main$view = function (_p15) {
-	var _p16 = _p15;
-	var _p17 = _p16.board;
+var _user$project$Main$view = function (_p17) {
+	var _p18 = _p17;
+	var _p19 = _p18.board;
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -11230,7 +11462,7 @@ var _user$project$Main$view = function (_p15) {
 					_1: {ctor: '[]'}
 				},
 				_user$project$Smiley$showFace(
-					_user$project$Main$gameOver(_p17))),
+					_user$project$Update$gameOver(_p19))),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -11250,11 +11482,11 @@ var _user$project$Main$view = function (_p15) {
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Attributes$width(
-										_elm_lang$core$Basics$toString(_user$project$Main$w * _user$project$Main$cellSize)),
+										_elm_lang$core$Basics$toString(_user$project$Game$w * _user$project$Main$cellSize)),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$svg$Svg_Attributes$height(
-											_elm_lang$core$Basics$toString(_user$project$Main$h * _user$project$Main$cellSize)),
+											_elm_lang$core$Basics$toString(_user$project$Game$h * _user$project$Main$cellSize)),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -11266,7 +11498,7 @@ var _user$project$Main$view = function (_p15) {
 										function (p, c) {
 											return A2(_user$project$Main$showCell, p, c);
 										}),
-									_p17))),
+									_p19))),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -11299,189 +11531,6 @@ var _user$project$Main$view = function (_p15) {
 			}
 		});
 };
-var _user$project$Main$adjacents = function (_p18) {
-	var _p19 = _p18;
-	var _p25 = _p19._1;
-	var _p24 = _p19._0;
-	var patch = A2(
-		_elm_lang$core$List$concatMap,
-		function (xx) {
-			return A2(
-				_elm_lang$core$List$map,
-				function (yy) {
-					return {ctor: '_Tuple2', _0: xx, _1: yy};
-				},
-				A2(_elm_lang$core$List$range, _p25 - 1, _p25 + 1));
-		},
-		A2(_elm_lang$core$List$range, _p24 - 1, _p24 + 1));
-	return A2(
-		_elm_lang$core$List$filter,
-		function (_p20) {
-			var _p21 = _p20;
-			var _p23 = _p21._1;
-			var _p22 = _p21._0;
-			return (!_elm_lang$core$Native_Utils.eq(
-				{ctor: '_Tuple2', _0: _p22, _1: _p23},
-				{ctor: '_Tuple2', _0: _p24, _1: _p25})) && ((_elm_lang$core$Native_Utils.cmp(_p22, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p23, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(_p22, _user$project$Main$w) < 0) && (_elm_lang$core$Native_Utils.cmp(_p23, _user$project$Main$h) < 0))));
-		},
-		patch);
-};
-var _user$project$Main$Cell = F4(
-	function (a, b, c, d) {
-		return {mined: a, exposed: b, flagged: c, mineCount: d};
-	});
-var _user$project$Main$generateCell = A2(
-	_mgold$elm_random_pcg$Random_Pcg$map,
-	function (t) {
-		return A4(
-			_user$project$Main$Cell,
-			_elm_lang$core$Native_Utils.cmp(t, 0.201) < 0,
-			false,
-			false,
-			0);
-	},
-	A2(_mgold$elm_random_pcg$Random_Pcg$float, 0.0, 1.0));
-var _user$project$Main$generateBoard = function () {
-	var indices = A2(
-		_elm_community$list_extra$List_Extra$andThen,
-		function (y) {
-			return A2(
-				_elm_community$list_extra$List_Extra$andThen,
-				function (x) {
-					return {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: x, _1: y},
-						_1: {ctor: '[]'}
-					};
-				},
-				A2(_elm_lang$core$List$range, 0, _user$project$Main$w - 1));
-		},
-		A2(_elm_lang$core$List$range, 0, _user$project$Main$h - 1));
-	return A2(
-		_mgold$elm_random_pcg$Random_Pcg$map,
-		function (cs) {
-			return _elm_lang$core$Dict$fromList(
-				A3(
-					_elm_lang$core$List$map2,
-					F2(
-						function (v0, v1) {
-							return {ctor: '_Tuple2', _0: v0, _1: v1};
-						}),
-					indices,
-					cs));
-		},
-		A2(
-			_mgold$elm_random_pcg$Random_Pcg$list,
-			_elm_lang$core$List$length(indices),
-			_user$project$Main$generateCell));
-}();
-var _user$project$Main$exposeCells = F2(
-	function (pos, board) {
-		var exposeMinedCell = F2(
-			function (_p26, c) {
-				return c.mined ? _elm_lang$core$Native_Utils.update(
-					c,
-					{exposed: true}) : c;
-			});
-		var indices = _user$project$Main$adjacents(pos);
-		var getCell = F2(
-			function (board, pos) {
-				return A2(
-					_elm_lang$core$Maybe$withDefault,
-					A4(_user$project$Main$Cell, false, false, false, 0),
-					A2(_elm_lang$core$Dict$get, pos, board));
-			});
-		var c = A2(getCell, board, pos);
-		var _p27 = c;
-		var mined = _p27.mined;
-		var exposed = _p27.exposed;
-		var flagged = _p27.flagged;
-		var count = _elm_lang$core$List$length(
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p28) {
-					var _p29 = _p28;
-					return _p29.mined;
-				},
-				A2(
-					_elm_lang$core$List$map,
-					getCell(board),
-					indices)));
-		var checklist = (mined || (exposed || (flagged || (!_elm_lang$core$Native_Utils.eq(count, 0))))) ? {ctor: '[]'} : indices;
-		var exposedSelection = A3(
-			_elm_lang$core$Dict$insert,
-			pos,
-			_elm_lang$core$Native_Utils.update(
-				c,
-				{exposed: true, mineCount: count}),
-			board);
-		var exposedNeighbors = A3(_elm_lang$core$List$foldl, _user$project$Main$exposeCells, exposedSelection, checklist);
-		var exposedMines = mined ? A2(_elm_lang$core$Dict$map, exposeMinedCell, exposedNeighbors) : exposedNeighbors;
-		return exposedMines;
-	});
-var _user$project$Main$update = F2(
-	function (msg, game) {
-		var _p30 = msg;
-		switch (_p30.ctor) {
-			case 'InitBoard':
-				var _p31 = A2(
-					_mgold$elm_random_pcg$Random_Pcg$step,
-					_user$project$Main$generateBoard,
-					_mgold$elm_random_pcg$Random_Pcg$initialSeed(_p30._0));
-				var b = _p31._0;
-				var ns = _p31._1;
-				return {
-					ctor: '_Tuple2',
-					_0: {board: b, seed: ns},
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'LeftPick':
-				return _user$project$Main$gameOver(game.board) ? {ctor: '_Tuple2', _0: game, _1: _elm_lang$core$Platform_Cmd$none} : {
-					ctor: '_Tuple2',
-					_0: {
-						board: A2(_user$project$Main$exposeCells, _p30._0, game.board),
-						seed: game.seed
-					},
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'RightPick':
-				var _p33 = _p30._0;
-				if (_user$project$Main$gameOver(game.board)) {
-					return {ctor: '_Tuple2', _0: game, _1: _elm_lang$core$Platform_Cmd$none};
-				} else {
-					var _p32 = game;
-					var board = _p32.board;
-					var seed = _p32.seed;
-					var c = A2(
-						_elm_lang$core$Maybe$withDefault,
-						A4(_user$project$Main$Cell, false, false, false, 0),
-						A2(_elm_lang$core$Dict$get, _p33, board));
-					return c.exposed ? {ctor: '_Tuple2', _0: game, _1: _elm_lang$core$Platform_Cmd$none} : {
-						ctor: '_Tuple2',
-						_0: {
-							board: A3(
-								_elm_lang$core$Dict$insert,
-								_p33,
-								_elm_lang$core$Native_Utils.update(
-									c,
-									{flagged: !c.flagged}),
-								board),
-							seed: seed
-						},
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				}
-			default:
-				var _p34 = A2(_mgold$elm_random_pcg$Random_Pcg$step, _user$project$Main$generateBoard, game.seed);
-				var b = _p34._0;
-				var s = _p34._1;
-				return {
-					ctor: '_Tuple2',
-					_0: {board: b, seed: s},
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-		}
-	});
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
 		init: {
@@ -11498,10 +11547,6 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
-var _user$project$Main$Game = F2(
-	function (a, b) {
-		return {board: a, seed: b};
-	});
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
