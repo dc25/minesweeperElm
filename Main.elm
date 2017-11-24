@@ -10,14 +10,15 @@ import Random.Pcg as R exposing (Generator, Seed, step, float, map, list,initial
 
 import RightClick exposing (onRightClick)
 import Pos exposing (..)
-import Game exposing (..)
 import Msg exposing (..)
 import Mine exposing (showMine)
 import Flag exposing (showFlag)
 import Smiley exposing (showFace)
 import Time exposing (now)
 import Task exposing (perform)
-import Update exposing (exposeCells, gameOver)
+import Board exposing (Cell, Board, w, h, exposeCells, gameOver)
+
+type alias Game = {board:Board, seed:Seed}
 
 cellSize : Int
 cellSize = 20
@@ -70,11 +71,11 @@ showText pos count =
 
 showCellDetail : Pos -> Cell -> List (Svg Msg)
 showCellDetail pos {mined, exposed, flagged, mineCount} = 
-    case (  mined, exposed, flagged, 0 == mineCount) of
-         (      _,       _,    True,     _) -> showFlag pos 
-         (   True,    True,       _,     _) -> showMine pos 
-         (      _,    True,       _, False) -> showText pos mineCount
-         (      _,       _,       _,     _) -> []
+    case ( flagged,   mined, exposed, 0 /= mineCount) of
+         (    True,       _,       _,       _) -> showFlag pos 
+         (       _,    True,    True,       _) -> showMine pos 
+         (       _,       _,    True,    True) -> showText pos mineCount
+         (       _,       _,       _,       _) -> []
 
 showCell : Pos -> Cell -> Svg Msg
 showCell pos cell = 
@@ -90,10 +91,10 @@ view ({board}) =
     div []
     (   [div [centerStyle] (showFace (gameOver board) )
         ,div [centerStyle] [ svg [ version "1.1"
-                      , width (toString (w * cellSize))
-                      , height (toString (h * cellSize))
-                      ]
-                      (values (Dict.map (\p c -> showCell p c) (board)))
+                                 , width (toString (w * cellSize))
+                                 , height (toString (h * cellSize))
+                                 ]
+                                 (values (Dict.map (\p c -> showCell p c) (board)))
                 ]
         ,div [centerStyle] [ button [onClick Reset] [text "reset"] ]
         ]
@@ -104,6 +105,10 @@ update msg game =
     case msg of
         InitBoard s -> 
             let (b,ns) = (step generateBoard (initialSeed s))
+            in ({board=b,seed=ns}, Cmd.none)
+
+        Reset -> 
+            let (b,ns) = step generateBoard game.seed
             in ({board=b,seed=ns}, Cmd.none)
 
         LeftPick pos -> 
@@ -119,9 +124,6 @@ update msg game =
                  in if (c.exposed)
                     then (game, Cmd.none) -- can't flag an exposed cell.
                     else ({board=insert pos ({c|flagged = not (c.flagged)}) board, seed=seed}, Cmd.none)
-
-        Reset -> let (b,s) = step generateBoard game.seed
-                 in ({board=b,seed=s}, Cmd.none)
 
 initBoard = perform (\t -> InitBoard (round t)) now
 
