@@ -1,12 +1,13 @@
-module RightClick exposing (onRightClick) 
+module RightClick exposing (onRightClick)
 
-import Json.Decode as Json
 import Html.Events exposing (onWithOptions)
+import Json.Decode as Json
+
 
 onRightClick message =
-  onWithOptions
-    "contextmenu"
-    { stopPropagation = True
-    , preventDefault = True
-    }
-    (Json.succeed message)
+    onWithOptions
+        "contextmenu"
+        { stopPropagation = True
+        , preventDefault = True
+        }
+        (Json.succeed message)

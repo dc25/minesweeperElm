@@ -2,5 +2,9 @@ module Msg exposing (Msg(..))
 
 import Pos exposing (..)
 
-type Msg = LeftPick Pos | RightPick Pos | Reset | InitBoard Int
 
+type Msg
+    = LeftPick Pos
+    | RightPick Pos
+    | Reset
+    | InitBoard Int
