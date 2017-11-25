@@ -155,6 +155,7 @@ view : Game -> Html Msg
 view { board } =
     div []
         [ div [ centerStyle ] (showFace (gameOver board))
+        , div [ centerStyle ] [text "Implemented in Elm"]
         , div [ centerStyle ]
             [ svg
                 [ version "1.1"
