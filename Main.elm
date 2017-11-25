@@ -52,7 +52,7 @@ generateBoard =
 getColor : Cell -> String
 getColor { exposed } =
     if exposed then
-        "#AAAAAA"
+        "#909090"
     else
         "#CCCCCC"
 
