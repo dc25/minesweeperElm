@@ -80,7 +80,9 @@ showCellDetail pos {mined, exposed, flagged, mineCount} =
 showCell : Pos -> Cell -> Svg Msg
 showCell pos cell = 
     let (x,y) = pos 
-    in g [ transform ("scale (" ++ toString cellSize ++ ", " ++ toString cellSize ++ ") " ++ "translate (" ++ toString x ++ ", " ++ toString y ++ ") " )
+        scale = toString cellSize
+    in g [ transform (  "scale (" ++ scale ++ ", " ++ scale ++ ") " 
+                     ++ "translate (" ++ toString x ++ ", " ++ toString y ++ ") "           )
          ]
          ([ showSquare pos cell ] ++ showCellDetail pos cell)
 
