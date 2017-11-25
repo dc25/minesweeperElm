@@ -23,12 +23,12 @@ type alias Board =
 
 w : Int
 w =
-    32
+    40
 
 
 h : Int
 h =
-    160
+    30
 
 
 generateCell : Generator Cell
