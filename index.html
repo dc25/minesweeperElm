@@ -10595,8 +10595,8 @@ var _user$project$Board$gameOver = function (board) {
 				}),
 			board));
 };
-var _user$project$Board$h = 160;
-var _user$project$Board$w = 32;
+var _user$project$Board$h = 30;
+var _user$project$Board$w = 40;
 var _user$project$Board$adjacents = function (_p3) {
 	var _p4 = _p3;
 	var _p10 = _p4._1;
@@ -11471,31 +11471,7 @@ var _user$project$Main$view = function (_p17) {
 					},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$svg$Svg$svg,
-							{
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$version('1.1'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$width(
-										_elm_lang$core$Basics$toString(_user$project$Board$w * _user$project$Main$cellSize)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$height(
-											_elm_lang$core$Basics$toString(_user$project$Board$h * _user$project$Main$cellSize)),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							_elm_lang$core$Dict$values(
-								A2(
-									_elm_lang$core$Dict$map,
-									F2(
-										function (p, c) {
-											return A2(_user$project$Main$showCell, p, c);
-										}),
-									_p19))),
+						_0: _elm_lang$html$Html$text('Implemented in Elm'),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -11510,20 +11486,59 @@ var _user$project$Main$view = function (_p17) {
 						{
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$button,
+								_elm_lang$svg$Svg$svg,
 								{
 									ctor: '::',
-									_0: _elm_lang$svg$Svg_Events$onClick(_user$project$Msg$Reset),
-									_1: {ctor: '[]'}
+									_0: _elm_lang$svg$Svg_Attributes$version('1.1'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$width(
+											_elm_lang$core$Basics$toString(_user$project$Board$w * _user$project$Main$cellSize)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$height(
+												_elm_lang$core$Basics$toString(_user$project$Board$h * _user$project$Main$cellSize)),
+											_1: {ctor: '[]'}
+										}
+									}
 								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('reset'),
-									_1: {ctor: '[]'}
-								}),
+								_elm_lang$core$Dict$values(
+									A2(
+										_elm_lang$core$Dict$map,
+										F2(
+											function (p, c) {
+												return A2(_user$project$Main$showCell, p, c);
+											}),
+										_p19))),
 							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _user$project$Main$centerStyle,
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Events$onClick(_user$project$Msg$Reset),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('reset'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
