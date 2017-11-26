@@ -77,7 +77,7 @@ showText pos count =
         textColor =
             case count of
                 1 ->
-                    "cyan"
+                    "blue"
 
                 2 ->
                     "green"
