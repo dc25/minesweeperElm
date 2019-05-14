@@ -6,7 +6,7 @@ import List.Extra exposing (andThen)
 import Maybe exposing (withDefault)
 import Msg exposing (..)
 import Pos exposing (..)
-import Random.Pcg as R exposing (Generator, float, list)
+import Random as R exposing (Generator, float, list)
 
 
 type alias Cell =
@@ -47,7 +47,7 @@ generateBoard =
                 )
                 (range 0 (h - 1))
     in
-    R.map (\cs -> fromList (map2 (,) indices cs))
+    R.map (\cs -> fromList (map2 (\a b->(a,b)) indices cs))
         (list (length indices) generateCell)
 
 
@@ -80,8 +80,8 @@ adjacents ( x, y ) =
 exposeCells : Pos -> Board -> Board
 exposeCells pos board =
     let
-        getCell board pos =
-            withDefault (Cell False False False 0) (get pos board)
+        getCell bd ps =
+            withDefault (Cell False False False 0) (get ps bd)
 
         c =
             getCell board pos
@@ -92,11 +92,8 @@ exposeCells pos board =
         count =
             length (List.filter (\{ mined } -> mined) (List.map (getCell board) indices))
 
-        { mined, exposed, flagged } =
-            c
-
         checklist =
-            if mined || exposed || flagged || count /= 0 then
+            if c.mined || c.exposed || c.flagged || count /= 0 then
                 []
             else
                 indices
@@ -107,14 +104,14 @@ exposeCells pos board =
         exposedNeighbors =
             List.foldl exposeCells exposedSelection checklist
 
-        exposeMinedCell _ c =
-            if c.mined then
-                { c | exposed = True }
+        exposeMinedCell _ cl =
+            if cl.mined then
+                { cl | exposed = True }
             else
-                c
+                cl
 
         exposedMines =
-            if mined then
+            if c.mined then
                 Dict.map exposeMinedCell exposedNeighbors
             else
                 exposedNeighbors

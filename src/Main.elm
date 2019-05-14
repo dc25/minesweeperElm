@@ -1,23 +1,25 @@
 module Main exposing (..)
 
+import Browser exposing (element)
 import Board exposing (Board, Cell, exposeCells, gameOver, h, w)
 import Dict exposing (Dict, filter, fromList, get, insert, isEmpty, values)
 import Flag exposing (showFlag)
-import Html exposing (Html, button, div, program, text)
+import Html exposing (Html, button, div, text)
 import List exposing (concatMap, filter, length, map, map2, range)
 import List.Extra exposing (andThen)
 import Maybe exposing (withDefault)
 import Mine exposing (showMine)
 import Msg exposing (..)
 import Pos exposing (..)
-import Random.Pcg as R exposing (Generator, Seed, float, initialSeed, list, map, step)
+import Random as R exposing (Generator, Seed, float, initialSeed, list, map, step)
 import RightClick exposing (onRightClick)
 import Smiley exposing (showFace)
 import Svg exposing (Svg, circle, g, line, polygon, rect, svg, text_)
 import Svg.Attributes exposing (fill, fontSize, height, r, style, textAnchor, transform, version, width, x, y)
 import Svg.Events exposing (onClick)
 import Task exposing (perform)
-import Time exposing (now)
+import Time exposing (Posix, now, posixToMillis)
+import String exposing (fromInt)
 
 
 type alias Game =
@@ -45,7 +47,7 @@ generateBoard =
                 )
                 (range 0 (h - 1))
     in
-    R.map (\cs -> fromList (map2 (,) indices cs))
+    R.map (\cs -> fromList (map2 (\a b -> (a,b)) indices cs))
         (list (length indices) generateCell)
 
 
@@ -100,26 +102,23 @@ showText pos count =
         , onClick (LeftPick pos)
         , onRightClick (RightPick pos)
         ]
-        [ Svg.text (toString count)
+        [ Svg.text (fromInt count)
         ]
     ]
 
 
 showCellDetail : Pos -> Cell -> List (Svg Msg)
-showCellDetail pos { mined, exposed, flagged, mineCount } =
-    case ( flagged, mined, exposed, 0 /= mineCount ) of
-        ( True, _, _, _ ) ->
-            showFlag pos
-
-        ( _, True, True, _ ) ->
+showCellDetail pos cell =
+    if cell.flagged then
+        showFlag pos
+    else
+        if cell.mined && cell.exposed then
             showMine pos
-
-        ( _, _, True, True ) ->
-            showText pos mineCount
-
-        ( _, _, _, _ ) ->
-            []
-
+        else
+            if cell.exposed && cell.mineCount /= 0 then
+                showText pos cell.mineCount
+            else
+                []
 
 showCell : Pos -> Cell -> Svg Msg
 showCell pos cell =
@@ -128,7 +127,7 @@ showCell pos cell =
             pos
 
         scale =
-            toString cellSize
+            fromInt cellSize
     in
     g
         [ transform
@@ -138,9 +137,9 @@ showCell pos cell =
                 ++ scale
                 ++ ") "
                 ++ "translate ("
-                ++ toString x
+                ++ fromInt x
                 ++ ", "
-                ++ toString y
+                ++ fromInt y
                 ++ ") "
             )
         ]
@@ -159,8 +158,8 @@ view { board } =
         , div [ centerStyle ]
             [ svg
                 [ version "1.1"
-                , width (toString (w * cellSize))
-                , height (toString (h * cellSize))
+                , width (fromInt (w * cellSize))
+                , height (fromInt (h * cellSize))
                 ]
                 (values (Dict.map (\p c -> showCell p c) board))
             ]
@@ -208,15 +207,18 @@ update msg game =
                 else
                     ( { board = insert pos { c | flagged = not c.flagged } board, seed = seed }, Cmd.none )
 
+boardMsgAtTime : Time.Posix -> Msg
+boardMsgAtTime t = InitBoard (posixToMillis t)
 
 initBoard =
-    perform (\t -> InitBoard (round t)) now
+    perform boardMsgAtTime Time.now
 
 
+main : Program () Game Msg
 main =
-    program
-        { init = ( { board = Dict.empty, seed = initialSeed 0 }, initBoard )
+    element
+        { init = \_ -> ( Game Dict.empty (initialSeed 0) , initBoard )
         , view = view
         , update = update
-        , subscriptions = \m -> Sub.none
+        , subscriptions = \_ -> Sub.none
         }

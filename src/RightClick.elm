@@ -1,13 +1,17 @@
 module RightClick exposing (onRightClick)
 
-import Html.Events exposing (onWithOptions)
+import Html as HTML
+import Html.Events as HEV exposing (custom)
 import Json.Decode as Json
 
 
-onRightClick message =
-    onWithOptions
-        "contextmenu"
-        { stopPropagation = True
-        , preventDefault = True
-        }
-        (Json.succeed message)
+onRightClick : msg -> HTML.Attribute msg
+onRightClick msg =
+    HEV.custom "contextmenu"
+        (Json.succeed
+            { message = msg
+            , stopPropagation = True
+            , preventDefault = True
+            }
+        )
+

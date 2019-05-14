@@ -8,6 +8,7 @@ import RightClick exposing (..)
 import Svg exposing (Svg, circle, g, path, polygon, svg)
 import Svg.Attributes exposing (cx, cy, d, fill, height, points, r, stroke, strokeWidth, style, transform, version, width)
 import Svg.Events exposing (onClick)
+import String exposing (fromInt, fromFloat)
 
 
 showFace : Bool -> List (Html Msg)
@@ -18,15 +19,15 @@ showFace lost =
     in
     [ svg
         [ version "1.1"
-        , width (toString sz)
-        , height (toString sz)
+        , width (fromInt sz)
+        , height (fromInt sz)
         ]
         [ g
             [ transform
                 ("    scale ("
-                    ++ toString sz
+                    ++ fromInt sz
                     ++ ", "
-                    ++ toString sz
+                    ++ fromInt sz
                     ++ ") "
                     ++ "translate (0.5, 0.5)"
                 )
@@ -46,7 +47,7 @@ showFace lost =
                    map
                     (\xc ->
                         circle
-                            [ cx (toString xc)
+                            [ cx (fromFloat xc)
                             , cy "-0.1"
                             , r "0.08"
                             , style "fill:yellow"
@@ -90,7 +91,7 @@ showFace lost =
                         map
                             (\( ex, dx, dy ) ->
                                 path
-                                    [ d ("M " ++ toString ex ++ " -0.1 l " ++ toString dx ++ " " ++ toString dy)
+                                    [ d ("M " ++ fromFloat ex ++ " -0.1 l " ++ fromFloat dx ++ " " ++ fromFloat dy)
                                     , stroke "black"
                                     , strokeWidth "0.02"
                                     , fill "none"
@@ -103,7 +104,7 @@ showFace lost =
                         map
                             (\xc ->
                                 circle
-                                    [ cx (toString xc)
+                                    [ cx (fromFloat xc)
                                     , cy "-0.1"
                                     , r "0.04"
                                     , style "fill:black"
