@@ -18,7 +18,7 @@ import Svg exposing (Svg, circle, g, line, polygon, rect, svg, text_)
 import Svg.Attributes exposing (fill, fontSize, height, r, style, textAnchor, transform, version, width, x, y)
 import Svg.Events exposing (onClick)
 import Task exposing (perform)
-import Time exposing (Posix, now, posixToMillis)
+import Time exposing (now, posixToMillis)
 import String exposing (fromInt)
 
 
@@ -207,11 +207,8 @@ update msg game =
                 else
                     ( { board = insert pos { c | flagged = not c.flagged } board, seed = seed }, Cmd.none )
 
-boardMsgAtTime : Time.Posix -> Msg
-boardMsgAtTime t = InitBoard (posixToMillis t)
-
 initBoard =
-    perform boardMsgAtTime Time.now
+    perform (\t -> InitBoard (posixToMillis t)) Time.now
 
 
 main : Program () Game Msg
